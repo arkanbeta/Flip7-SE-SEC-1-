@@ -1,0 +1,208 @@
+/* Playing cards: printed-paper fronts, deep teal backs. Everything scales with --card-w. */
+.playing-card {
+  --card-w: 7rem;
+  --card-accent: var(--teal-700);                                   /* ornament and frame */
+  --card-ink: color-mix(in srgb, var(--card-accent) 72%, var(--ink-900)); /* the big number */
+  --card-paper: var(--cream-50);
+  --card-radius: calc(var(--card-w) * 0.11);
+  display: inline-block;
+  flex: none;
+  width: var(--card-w);
+  aspect-ratio: 5 / 7;
+  padding: 0;
+  border: 0;
+  background: none;
+  perspective: 900px;
+  font: inherit;
+  color: inherit;
+}
+.playing-card--xs { --card-w: 2.9rem; }
+.playing-card--sm { --card-w: 4.5rem; }
+.playing-card--lg { --card-w: 10rem; }
+@media (max-width: 600px) {
+  .playing-card--lg { --card-w: 8rem; }
+}
+
+/* ---- accents: each Number value has its own earthy tone ---- */
+.playing-card--tone-0 { --card-accent: var(--teal-700); }
+.playing-card--tone-1 { --card-accent: var(--terracotta-500); }
+.playing-card--tone-2 { --card-accent: #A87A2C; }
+.playing-card--tone-3 { --card-accent: var(--sage-600); }
+.playing-card--tone-4 { --card-accent: var(--tan-500); }
+.playing-card--tone-5 { --card-accent: #4F8994; }
+.playing-card--kind-modifier { --card-accent: var(--sage-600); --card-paper: color-mix(in srgb, var(--sage-300) 30%, var(--cream-50)); }
+.playing-card--kind-freeze { --card-accent: #3F7F8C; --card-paper: color-mix(in srgb, var(--ice-500) 20%, var(--cream-50)); }
+.playing-card--kind-second_chance { --card-accent: var(--terracotta-500); --card-paper: color-mix(in srgb, var(--terracotta-500) 12%, var(--cream-50)); }
+.playing-card--kind-flip_three { --card-accent: #A87A2C; --card-paper: color-mix(in srgb, var(--ochre-500) 18%, var(--cream-50)); }
+
+/* ---- the 3D flip ---- */
+.playing-card__inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateY(180deg); /* face-down by default */
+  transition: transform var(--duration-flip) var(--ease-out);
+}
+.is-face-up .playing-card__inner {
+  transform: rotateY(0deg);
+}
+
+.playing-card__face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--card-radius);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+/* ---- front: textured paper, a hairline inner frame, corner indices ---- */
+.playing-card__face--front {
+  color: var(--card-accent);
+  background:
+    var(--texture-paper),
+    radial-gradient(120% 90% at 30% 15%, rgb(255 255 255 / 0.6), transparent 60%),
+    var(--card-paper);
+  border: 1px solid color-mix(in srgb, var(--card-accent) 22%, var(--cream-300));
+}
+.playing-card__frame {
+  position: absolute;
+  inset: 6%;
+  border: max(1px, calc(var(--card-w) * 0.012)) solid color-mix(in srgb, var(--card-accent) 45%, transparent);
+  border-radius: calc(var(--card-radius) * 0.6);
+  pointer-events: none;
+}
+.playing-card__frame::before {
+  /* a second, finer line inside the frame: the "printed card" detail */
+  content: '';
+  position: absolute;
+  inset: 4%;
+  border: 1px solid color-mix(in srgb, var(--card-accent) 18%, transparent);
+  border-radius: inherit;
+}
+.playing-card__face--front::before,
+.playing-card__face--front::after {
+  content: attr(data-label);
+  position: absolute;
+  z-index: 1;
+  top: 9%;
+  left: 12%;
+  font-family: var(--font-display);
+  font-size: calc(var(--card-w) * 0.15);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--card-ink);
+}
+.playing-card__face--front::after {
+  top: auto;
+  left: auto;
+  right: 12%;
+  bottom: 9%;
+  transform: rotate(180deg);
+}
+.playing-card--xs .playing-card__face--front::before,
+.playing-card--xs .playing-card__face--front::after { display: none; }
+
+.card-art { position: absolute; display: block; pointer-events: none; }
+.card-art--ornament { inset: 0; width: 100%; height: 100%; }
+
+.playing-card__value {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-size: calc(var(--card-w) * 0.48);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--card-ink);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.7);
+}
+.playing-card--kind-modifier .playing-card__value { font-size: calc(var(--card-w) * 0.36); }
+
+/* special cards: an icon with an optional caption */
+.playing-card__special {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--card-w) * 0.05);
+  color: var(--card-accent);
+}
+/* every Action card uses the same icon size and caption style (one family) */
+.playing-card__special .card-art--icon {
+  position: static;
+  width: calc(var(--card-w) * 0.6);
+  height: calc(var(--card-w) * 0.6);
+}
+.playing-card--kind-flip_three .playing-card__face--front::before,
+.playing-card--kind-flip_three .playing-card__face--front::after { font-size: calc(var(--card-w) * 0.12); }
+/* at table sizes the pips only add noise next to the corner index and caption */
+.playing-card--sm .card-art__pips,
+.playing-card--xs .card-art__pips { display: none; }
+.playing-card__caption {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  max-width: 90%;
+  font-family: var(--font-body);
+  font-size: max(0.55rem, calc(var(--card-w) * 0.13));
+  font-weight: 800;
+  line-height: 1.05;
+  text-align: center;
+  color: var(--card-ink);
+}
+
+/* ---- back: deep teal, lattice, frame and monogram ---- */
+.playing-card__face--back {
+  transform: rotateY(180deg);
+  background:
+    var(--texture-felt),
+    radial-gradient(110% 80% at 30% 10%, rgb(255 255 255 / 0.14), transparent 60%),
+    linear-gradient(160deg, var(--teal-600), var(--teal-800));
+  border: 1px solid var(--teal-900);
+}
+.card-art--back { inset: 0; width: 100%; height: 100%; }
+
+/* ---- states ---- */
+button.playing-card {
+  cursor: pointer;
+}
+button.playing-card:hover:not(:disabled) .playing-card__inner {
+  transform: translateY(-6px) rotateY(0deg);
+}
+button.playing-card:not(.is-face-up):hover:not(:disabled) .playing-card__inner {
+  transform: translateY(-6px) rotateY(180deg);
+}
+.playing-card--selected .playing-card__face--front {
+  border-color: var(--board-highlight);
+  box-shadow: 0 0 0 3px var(--board-highlight), var(--shadow-card);
+}
+/* A bust: the line is spoiled, so the cards take a terracotta wash. */
+.playing-card--danger { --card-accent: var(--terracotta-500); }
+.playing-card--danger .playing-card__face--front {
+  border-color: var(--terracotta-500);
+  background:
+    var(--texture-paper),
+    color-mix(in srgb, var(--terracotta-500) 16%, var(--cream-50));
+}
+.playing-card--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- dealing: a new card slides in and turns face-up; a busted card shakes once ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .playing-card--deal { animation: card-slide var(--duration-flip, 400ms) var(--ease-out, ease-out) both; }
+  .playing-card--deal .playing-card__inner { animation: card-turn var(--duration-flip, 400ms) var(--ease-out, ease-out) both; }
+  .playing-card--danger { animation: card-shake 400ms ease-in-out 1 both; }
+}
+@keyframes card-slide { from { opacity: 0; transform: translateY(-0.9rem) scale(0.85) rotate(-5deg); } }
+@keyframes card-turn { from { transform: rotateY(180deg); } }
+@keyframes card-shake { 25% { transform: translateX(-4px); } 50% { transform: translateX(4px); } 75% { transform: translateX(-2px); } }

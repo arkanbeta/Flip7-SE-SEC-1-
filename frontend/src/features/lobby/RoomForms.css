@@ -1,0 +1,21 @@
+.choice { margin: 0 0 var(--space-4); padding: 0; border: 0; }
+.choice legend { margin-bottom: var(--space-2); font-weight: 700; }
+.choice__option { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) 0; }
+.choice__row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.choice__chip { position: relative; }
+.choice__chip input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.choice__chip span {
+  display: grid; place-items: center; width: 3rem; height: 3rem;
+  font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600;
+  background: var(--color-surface); border: 2px solid var(--color-field-border); border-radius: var(--radius-md);
+}
+.choice__chip input:checked + span { color: var(--color-on-primary); background: var(--color-primary); border-color: var(--color-primary); }
+.choice__chip input:focus-visible + span { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+.choice__hint { margin: var(--space-2) 0 0; color: var(--color-text-secondary); font-size: var(--text-sm); }
+.form-error {
+  margin: 0 0 var(--space-3); padding: var(--space-3) var(--space-4); color: var(--color-error-text);
+  background: var(--color-error-soft); border-radius: var(--radius-sm);
+}
+.form-note { margin: var(--space-2) 0 0; }
+/* the code box looks like the code card in the waiting room, so it is recognised at a glance */
+.field--code input { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; }

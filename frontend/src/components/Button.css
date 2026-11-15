@@ -1,0 +1,65 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 2.75rem; /* comfortable touch target */
+  padding: 0 var(--space-5);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.btn {
+  letter-spacing: 0.01em;
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* raised teal, like a printed token */
+.btn--primary {
+  background: linear-gradient(180deg, var(--teal-600), var(--teal-700));
+  color: var(--color-on-primary);
+  border-color: var(--teal-800);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 2px 0 var(--teal-900), 0 6px 14px -6px rgb(20 60 55 / 0.6);
+}
+.btn--primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, var(--teal-700), var(--teal-800));
+}
+.btn--primary:active:not(:disabled) {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), 0 1px 0 var(--teal-900);
+}
+
+/* cream paper */
+.btn--secondary {
+  background: linear-gradient(180deg, var(--cream-50), var(--cream-200));
+  color: var(--color-text);
+  border-color: var(--color-field-border);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), 0 2px 0 color-mix(in srgb, var(--tan-500) 55%, transparent), 0 6px 12px -8px rgb(70 50 25 / 0.45);
+}
+.btn--secondary:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--teal-800);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn__spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin 0.7s linear infinite;
+}
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}

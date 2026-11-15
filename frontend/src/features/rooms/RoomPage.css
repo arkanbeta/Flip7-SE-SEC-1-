@@ -1,0 +1,57 @@
+.room { display: flex; flex-direction: column; gap: var(--space-5); }
+.room__top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-4); }
+.room__top h1 { margin: 0; font-size: var(--text-2xl); }
+.room__mode { margin: 0; color: var(--color-secondary-text); font-weight: 700; }
+.room__code {
+  display: flex; flex-direction: column; align-items: center; padding: var(--space-3) var(--space-5);
+  font: inherit; color: var(--color-text); background: var(--color-surface);
+  border: 2px dashed var(--color-primary); border-radius: var(--radius-md); cursor: pointer;
+}
+.room__code:hover { background: var(--color-primary-soft); }
+.room__code-label, .room__code-copy { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.room__code-value { font-family: var(--font-display); font-size: var(--text-2xl); letter-spacing: 0.15em; font-weight: 600; }
+.room__count, .room__wait { margin: 0; color: var(--color-text-secondary); font-weight: 700; }
+.room__players { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
+.room__player {
+  display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4);
+  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md);
+}
+.room__player--empty { justify-content: center; min-height: 4.5rem; color: var(--color-text-secondary); border-style: dashed; background: transparent; }
+.room__player-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.room__badge { padding: 0.1rem 0.6rem; font-size: var(--text-sm); font-weight: 700; color: var(--color-on-primary); background: var(--color-primary); border-radius: var(--radius-pill); }
+.room__prompt, .room__notice { padding: var(--space-4) var(--space-5); background: var(--color-primary-soft); border: 1px solid var(--color-primary); border-radius: var(--radius-md); }
+.room__notice { background: var(--color-warning-soft); border-color: var(--color-warning); }
+.room__prompt h2, .room__notice h2 { margin: 0 0 var(--space-2); font-size: var(--text-xl); }
+.room__prompt p { margin: 0 0 var(--space-3); }
+.room__prompt-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.room__footer, .room__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-3); }
+/* host's "Manage players" dialog: one row per player, name left, actions right */
+.manage__list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+.manage__row { display: flex; align-items: center; gap: var(--space-3); }
+.manage__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.manage__hint { margin: var(--space-3) 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
+.room__connection { margin: 0; padding: var(--space-3) var(--space-4); background: var(--color-warning-soft); border: 1px solid var(--color-warning); border-radius: var(--radius-sm); }
+
+.room__spectating { margin: 0 0 var(--space-3); padding: var(--space-2) var(--space-3); background: var(--color-primary-soft); border-radius: var(--radius-sm); }
+
+/* ---- redesign: paper surfaces for the waiting room ---- */
+.room__top h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); color: var(--teal-800); }
+.room__code,
+.room__player:not(.room__player--empty),
+.room__prompt,
+.room__notice {
+  background: var(--texture-paper), radial-gradient(100% 120% at 20% 0%, rgb(255 255 255 / 0.5), transparent 60%), var(--cream-100);
+  box-shadow: var(--shadow-inset), var(--shadow-md);
+}
+.room__code { border-color: var(--teal-600); border-radius: var(--radius-lg); }
+.room__code-value { color: var(--teal-800); }
+.room__player { border-radius: var(--radius-lg); }
+.room__player .avatar { box-shadow: 0 0 0 3px var(--cream-50), 0 0 0 4px var(--color-border); }
+.room__player-name { font-family: var(--font-display); font-weight: 600; font-size: var(--text-lg); }
+.room__player--empty { border: 1.5px dashed color-mix(in srgb, var(--tan-500) 55%, transparent); }
+/* your own seat: same ochre edge as "your turn" on the table */
+.room__player--me { border-color: color-mix(in srgb, var(--ochre-500) 70%, var(--cream-300)); }
+.room__you { font-family: var(--font-body); font-size: var(--text-sm); font-weight: 700; color: var(--color-text-secondary); }
+.room__badge { background: linear-gradient(180deg, var(--teal-600), var(--teal-700)); }
+.room__prompt { border-color: color-mix(in srgb, var(--ochre-500) 60%, var(--cream-300)); }
+.room__prompt h2 { color: var(--teal-800); }

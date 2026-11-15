@@ -1,0 +1,30 @@
+.full-page-message {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+.full-page-message h1 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.5rem;
+}
+.full-page-message p {
+  margin: 0;
+}
+.full-page-message__spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: full-page-spin 0.9s linear infinite;
+}
+@keyframes full-page-spin {
+  to { transform: rotate(360deg); }
+}

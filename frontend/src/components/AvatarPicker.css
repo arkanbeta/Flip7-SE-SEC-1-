@@ -1,0 +1,49 @@
+.avatar-picker {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.avatar-picker legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-weight: 700;
+}
+.avatar-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.25rem, 1fr));
+  gap: var(--space-2);
+}
+.avatar-option {
+  position: relative;
+  display: block;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.avatar-option input {
+  /* Visually hidden but still focusable and announced by screen readers. */
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.avatar-option img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  transition: transform var(--duration-fast) ease, border-color var(--duration-fast) ease;
+}
+.avatar-option:hover img {
+  transform: translateY(-2px);
+}
+.avatar-option input:checked + img {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-primary);
+}
+.avatar-option input:focus-visible + img {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}

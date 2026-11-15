@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Secrets - never commit real credentials
+.env
+.env.*
+!.env.example
+
+# Build output and tooling
+dist/
+coverage/
+*.log
+.DS_Store
+.vscode/
+.idea/
