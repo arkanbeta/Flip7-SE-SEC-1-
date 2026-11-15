@@ -71,22 +71,39 @@ export function createRoomService({ pool, manager, games, generateCode = generat
     return getCurrentRoom(userId);
   }
 
+  // Every change is sent to all the members at the same moment: they share ONE Users query
+  // instead of each running their own. Nothing is kept once it has answered, so a changed
+  // nickname shows up with the next change.
+  function loadUsers(room, ids) {
+    const key = ids.join();
+    if (room.usersQuery?.key !== key) {
+      const rows = pool.query('SELECT user_id, nickname, avatar FROM Users WHERE user_id IN (?)', [ids]).then(([users]) => users);
+      const done = () => {
+        if (room.usersQuery?.rows === rows) room.usersQuery = null;
+      };
+      rows.then(done, done);
+      room.usersQuery = { key, rows };
+    }
+    return room.usersQuery.rows;
+  }
+
   // Everything the browser needs to draw the room, from the point of view of `userId`.
   async function present(room, viewerId) {
     const ids = [...room.members.keys()];
-    const [users] = await pool.query(
-      'SELECT user_id, nickname, avatar FROM Users WHERE user_id IN (?)',
-      [ids]
-    );
+    const users = await loadUsers(room, ids);
     const byId = new Map(users.map((u) => [u.user_id, u]));
-    const [modes] = await pool.query('SELECT name FROM GameModes WHERE game_mode_id = ?', [room.gameModeId]);
+    // A room's game mode never changes, so its name is read once.
+    if (!room.gameModeName) {
+      const [modes] = await pool.query('SELECT name FROM GameModes WHERE game_mode_id = ?', [room.gameModeId]);
+      room.gameModeName = modes[0]?.name;
+    }
     const isCreator = room.creatorId === viewerId;
     const game = games.view(room.code);
 
     return {
       code: room.code,
       status: room.status,
-      gameMode: { id: room.gameModeId, name: modes[0]?.name ?? 'Unknown' },
+      gameMode: { id: room.gameModeId, name: room.gameModeName ?? 'Unknown' },
       maxPlayers: room.maxPlayers,
       minPlayers: MIN_PLAYERS,
       playerCount: room.members.size,

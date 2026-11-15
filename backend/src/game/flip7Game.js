@@ -130,8 +130,10 @@ export class Game {
       this.#finish('last_player');
       return this.#eventsSince(mark);
     }
-    if (this.round && this.phase === 'playing') {
-      const hand = this.round.hands.get(playerId);
+    const hand = this.phase === 'playing' ? this.round?.hands.get(playerId) : null;
+    // Leaving in the middle of your own Flip Three does not stop it: the cards keep coming and
+    // #flipThree marks the hand as left when it is done (PROJECT OWNER'S RULE).
+    if (hand && !hand.flipping) {
       hand.status = STATUS.LEFT; // whatever they had this round is lost with them
       if (hand.secondChance) {
         this.discardPile.push(hand.secondChance);
@@ -139,10 +141,17 @@ export class Game {
         hand.secondChance = null;
       }
     }
-    if (this.decision?.playerId === playerId) this.#resume(this.#defaultAnswer(this.decision));
-    else {
-      this.seq += 1;
-      if (this.phase === 'round_over') this.#checkWin(); // the leaver may have been the one tied at the top
+    const d = this.decision;
+    this.seq += 1;
+    if (d?.playerId === playerId) {
+      if (d.type !== 'flip_three_draw') this.#resume(this.#defaultAnswer(d)); // (the clock goes on drawing by itself)
+    } else if (this.phase === 'round_over') {
+      this.#checkWin(); // the leaver may have been the one tied at the top
+    } else if (d?.type !== 'flip_three_draw' && d?.options?.includes(playerId)) {
+      // Someone else is choosing who gets a card: a player who left can no longer be chosen.
+      d.options = d.options.filter((id) => id !== playerId);
+      if (d.type === 'choose_target' && d.options.length === 1) this.#resume({ type: 'target', targetId: d.options[0] }); // the only active player must receive it
+      else if (d.options.length === 0) this.#resume({ type: 'gift', targetId: null }); // nobody left to give it to: discarded
     }
     return this.#eventsSince(mark);
   }
@@ -397,7 +406,8 @@ export class Game {
         return;
       }
       // Already holding one: it must go to another active player without one, or be discarded.
-      const options = this.#activeIds().filter((other) => other !== id && !round.hands.get(other).secondChance);
+      // (Someone who left during their Flip Three cannot choose: their spare one is discarded.)
+      const options = this.#player(id).left ? [] : this.#activeIds().filter((other) => other !== id && !round.hands.get(other).secondChance);
       if (options.length === 0) {
         this.discardPile.push(card);
         this.#emit('second_chance_discarded', { playerId: id });
@@ -464,18 +474,21 @@ export class Game {
     const setAside = [];
     let drawn = 0;
 
+    hand.flipping = true; // removePlayer leaves the hand alone while this is set
     for (let i = 0; i < 3; i += 1) {
       if (round.ended || hand.status !== STATUS.ACTIVE) break;
       // A pause nobody answers: the clock resumes it (timeout()), so the cards arrive one by one.
       // Cards not drawn after a bust simply stay on top of the draw pile, in their order.
       yield { type: 'flip_three_draw', playerId: targetId, card: 'flip_three', options: [i + 1] };
-      if (round.ended || hand.status !== STATUS.ACTIVE) break; // they may have left during the pause
       const card = this.#draw();
-      if (!card) return;
+      if (!card) break;
       drawn += 1;
       this.#emit('card_dealt', { playerId: targetId, card: this.#cardInfo(card), via: 'flip_three' });
       yield* this.#receive(targetId, card, setAside);
     }
+    hand.flipping = false;
+    // They left while the cards were coming: a bust stays a bust, anything else is now "left".
+    if (this.#player(targetId).left && hand.status === STATUS.ACTIVE) hand.status = STATUS.LEFT;
     // Tell the table why the drawing stopped early (the undrawn cards stay on the deck).
     if (hand.status === STATUS.BUSTED && drawn < 3) this.#emit('flip_three_stopped', { playerId: targetId, remaining: 3 - drawn });
 
@@ -537,7 +550,8 @@ export class Game {
         const points = p.left && !p.keepPoints ? 0 : p.total;
         return { userId: p.id, finalPoints: points, rankingPoints: points, hits: p.hits, busts: p.busts, left: p.left };
       })
-      .sort((a, b) => b.finalPoints - a.finalPoints);
+      // Winner first: a player the host removed keeps their points and may have more than the winner.
+      .sort((a, b) => winnerIds.includes(b.userId) - winnerIds.includes(a.userId) || b.finalPoints - a.finalPoints);
     this.result = { reason, rounds: this.roundNumber, winnerIds, standings };
     this.#emit('match_completed', { winnerIds, reason });
     this.seq += 1;
