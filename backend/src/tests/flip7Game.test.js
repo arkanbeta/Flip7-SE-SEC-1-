@@ -744,6 +744,7 @@ describe('leaving the match', () => {
     g.removePlayer(1, { keepPoints: true }); // the leader is kicked
     g.removePlayer(3);
     expect(g.result.winnerIds).toEqual([2]);
+    expect(g.result.standings.map((x) => x.userId)).toEqual([2, 1, 3]); // the winner is listed first, even with fewer points
     const byUser = Object.fromEntries(g.result.standings.map((x) => [x.userId, x]));
     expect(byUser[1]).toMatchObject({ finalPoints: 7, rankingPoints: 7, left: true });
     expect(byUser[3]).toMatchObject({ finalPoints: 0, rankingPoints: 0, left: true });
@@ -779,6 +780,47 @@ describe('leaving the match', () => {
     everyoneStays(g);
     g.beginNextRound();
     expect(p(g, 3)).toMatchObject({ status: STATUS.LEFT, numbers: [] });
+  });
+
+  it('a player who left can no longer be chosen for a card', () => {
+    const g = newGame(['n1', 'n2', 'F'], { players: [1, 2, 3, 4] }); // player 4 is dealt the Freeze
+    expect(g.decision).toMatchObject({ type: 'choose_target', playerId: 4, options: [1, 2, 3, 4] });
+    g.removePlayer(3);
+    expect(g.decision.options).toEqual([1, 2, 4]);
+    expect(errorCode(() => target(g, 4, 3))).toBe('INVALID_MOVE');
+    expect(g.decision.type).toBe('choose_target'); // the card is still waiting for a real choice
+  });
+
+  it('when the leaver was the only other choice, the holder must take the card', () => {
+    const g = newGame(['n1', 'n2', 'n3', 'F']);
+    stay(g, 2);
+    hit(g, 3); // draws the Freeze: player 1 or themselves
+    expect(g.decision).toMatchObject({ type: 'choose_target', playerId: 3, options: [1, 3] });
+    g.removePlayer(1);
+    expect(g.hand(3).status).toBe(STATUS.FROZEN);
+  });
+
+  // Game.prototype.* = without the test helper that draws all three cards at once.
+  it('leaving in the middle of your Flip Three: the cards keep coming, then you count as left', () => {
+    const g = newGame(['n1', 'n2', 'n3', 'T', 'n4', 'n5', 'n6']);
+    hit(g, 2);
+    Game.prototype.act.call(g, 2, { type: 'target', targetId: 3 });
+    Game.prototype.removePlayer.call(g, 3);
+    expect(g.decision).toMatchObject({ type: 'flip_three_draw', playerId: 3 });
+    expect(g.hand(3).status).toBe(STATUS.ACTIVE);
+    g.timeout(); // the clock draws the three cards
+    expect(g.hand(3)).toMatchObject({ numbers: [2, 4, 5, 6], status: STATUS.LEFT });
+    expect(p(g, 3).roundScore).toBe(0);
+    expect(g.decision).toMatchObject({ type: 'hit_or_stay', playerId: 1 });
+  });
+
+  it('leaving in the middle of your Flip Three: a bust stays a bust', () => {
+    const g = newGame(['n1', 'n2', 'n3', 'T', 'n2']);
+    hit(g, 2);
+    Game.prototype.act.call(g, 2, { type: 'target', targetId: 3 });
+    Game.prototype.removePlayer.call(g, 3);
+    g.timeout();
+    expect(g.hand(3).status).toBe(STATUS.BUSTED);
   });
 });
 

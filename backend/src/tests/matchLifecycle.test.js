@@ -317,6 +317,34 @@ describe('the host removes a player (kick / ban)', () => {
     expect(room.players.some((p) => p.canKick)).toBe(false);
   });
 
+  it('a player leaving does not restart the clock of whoever is being asked', () => {
+    const manager = createRoomManager({ startPromptMs: 60_000, logger: silentLogger });
+    let clocks = 0;
+    const setTimer = (fn, ms) => [(clocks += 1), setTimeout(fn, ms)][1];
+    const games = createGameManager({ manager, turnMs: 60_000, roundEndMs: 60_000, makeDeck: plainDeck, logger: silentLogger, setTimer });
+    toClean.push(() => { games.shutdown(); manager.shutdown(); });
+    manager.createRoom({ roomId: 7, code: 'ABCD', creatorId: 1, gameModeId: 1, maxPlayers: 7 });
+    for (const id of [2, 3, 4]) manager.join('ABCD', id);
+    games.start(manager.markStarted('ABCD'));
+    const asked = games.view('ABCD').decision.playerId;
+    games.removePlayer('ABCD', [1, 2, 3, 4].find((id) => id !== asked));
+    expect(clocks).toBe(1);
+    games.act(asked, { type: 'stay', decisionId: games.view('ABCD').decision.id });
+    expect(clocks).toBe(2); // a new question does get a new clock
+  });
+
+  it('one change costs one Users query for the whole room, not one per player', async () => {
+    const s = await setup([1, 2, 3], { start: false });
+    const { createRoomService } = await import('../services/roomService.js');
+    const asked = [];
+    const pool = { query: async (sql) => [(asked.push(sql), [])] };
+    const service = createRoomService({ pool, manager: s.manager, games: s.games, logger: silentLogger });
+    await Promise.all([1, 2, 3].map((id) => service.getCurrentRoom(id)));
+    expect(asked.filter((sql) => sql.includes('FROM Users'))).toHaveLength(1);
+    await service.getCurrentRoom(1);
+    expect(asked.filter((sql) => sql.includes('FROM Users'))).toHaveLength(2); // nothing is kept afterwards
+  });
+
   it('someone who is only watching can always be kicked', async () => {
     const s = await setup([1, 2, 3]);
     s.manager.join('ABCD', 4); // joins the running match: a spectator

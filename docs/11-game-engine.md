@@ -35,6 +35,7 @@ Dealing one card each (dealer last, an Action card pauses the deal); Hit gives o
 |---|---|
 | Ranking points | Equal to the points earned in the game when it finishes (`ranking_points` = `final_points`) |
 | Leaving mid-match | The leaver gets **nothing** (0 final, 0 ranking points) and still gets a result row. Leaving a running match needs a **confirmation** (see below) |
+| Leavers and card choices | A player who has left **cannot be chosen** for a Freeze, a Flip Three or a spare Second Chance: they are taken out of a choice that is already waiting, and if that leaves only the holder, the holder must take the card. Someone who leaves **in the middle of their own Flip Three** still gets the rest of the three cards: a bust stays a bust, otherwise they count as left once the drawing ends (0 points either way; a spare Second Chance they draw is discarded) |
 | Second Chance (house rule) | When a Second Chance saves a duplicate, **only the Second Chance is discarded; the duplicate stays in the line and its points count**. The printed rulebook discards both. A further copy still busts; Flip 7 still needs seven *different* numbers. The view marks saved cards in `savedIndexes`, and the table plays a short "duplicate, saved" animation. To go back to the printed rule, change the Second Chance branch of `#receive` in `flip7Game.js` (marked PROJECT OWNER'S RULE) |
 | Turn time limit | **15 seconds** (`GAME_TURN_SECONDS`). No answer = automatic **Stay** |
 | Creator leaves on the results screen | Room stays, no transfer; if the others play again without them, the longest-present player becomes owner (Phase 7) |
@@ -62,7 +63,7 @@ When the match ends, `gameManager` calls `hooks.onFinished({ room, result, start
 
 ```
 { reason: 'target_reached' | 'last_player', rounds, winnerIds: [userId],
-  standings: [{ userId, finalPoints, rankingPoints, hits, busts, left }]  // best first, leavers on 0
+  standings: [{ userId, finalPoints, rankingPoints, hits, busts, left }]  // winner first, then by points; leavers on 0
 }
 ```
 
@@ -82,9 +83,9 @@ If the room empties while a match is still running (the room closes), `hooks.onA
 
 ## Tests
 
-- `flip7Game.test.js` (75): the deck, every rule above with hand-stacked decks (rulebook example 66 / 81 included), time-outs, leavers, and **450 randomly played full games** that check the invariants (finish, all 94 cards accounted for between rounds, winner has the top score, leavers on 0). It found a real bug (a leaver's Second Chance discarded twice).
+- `flip7Game.test.js` (85): the deck, every rule above with hand-stacked decks (rulebook example 66 / 81 included), time-outs, leavers, and **450 randomly played full games** that check the invariants (finish, all 94 cards accounted for between rounds, winner has the top score, leavers on 0). It found a real bug (a leaver's Second Chance discarded twice).
 - `game.integration.test.js` (31, real MySQL + sockets): start, moves over HTTP, wrong player, forged player id, double-click, malformed moves, rate limit, live push, leave confirmation, one-player-left, finished-match reporting, clocks (auto-Stay, next round) with short timers.
-- `matchLifecycle.test.js` (13, no database): finished match reported once, abandoned room, ready rules, creator rule, saving transaction with retries (fake pool).
+- `matchLifecycle.test.js` (28, no database): finished match reported once, abandoned room, ready rules, creator rule, saving transaction with retries (fake pool).
 - `match.integration.test.js` (16, real MySQL): rows written and totals updated, leavers on 0, one match shared by all players, second match saved separately, ready validation/CSRF, rematch start, creator leaving on the results screen, takeover in the database, closing. Mutation checks (always promote, no points update, no takeover) all fail the suite.
 - Frontend `game.test.jsx` (42): the table, every kind of question, countdown, summary, results, leave dialog, live updates, event wording.
 

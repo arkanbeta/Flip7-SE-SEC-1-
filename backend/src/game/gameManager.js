@@ -33,8 +33,13 @@ export function createGameManager({
 
   // Starts the right clock for whatever the game is waiting for now.
   function schedule(code, entry) {
-    clear(entry);
     const { game } = entry;
+    // Still waiting for the same thing (someone else left, say): its clock keeps running
+    // instead of starting again.
+    const waitingFor = game.finished ? null : game.phase === 'round_over' ? `round ${game.roundNumber}` : game.decision && `decision ${game.decision.id}`;
+    if (entry.timer && waitingFor && waitingFor === entry.waitingFor) return;
+    clear(entry);
+    entry.waitingFor = waitingFor;
     if (game.finished) return;
     let ms;
     let run;
