@@ -79,6 +79,9 @@ export function loadConfig(env = process.env) {
     // Number of reverse proxies in front of the backend (0 = none). Needed so
     // rate limiting sees real client IPs and "Secure" cookies work behind a proxy.
     trustProxy: readNonNegativeInt(env, 'TRUST_PROXY', 0),
+    // DEVELOPMENT ONLY: sign in as a local test player without Google. Can never be
+    // switched on in production, whatever the variable says.
+    devLogin: !isProduction && env.DEV_LOGIN_ENABLED === 'true',
     db: Object.freeze({
       host: readRequired(env, 'DB_HOST'),
       port: readPositiveInt(env, 'DB_PORT', 3306),

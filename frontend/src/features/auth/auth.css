@@ -159,6 +159,15 @@
   box-shadow: 0 1px 6px rgb(65 105 225 / 0.18);
 }
 
+.dev-login {
+  margin: var(--space-3) 0 0;
+  font-size: 0.875rem;
+  text-align: center;
+}
+.dev-login a {
+  margin-left: var(--space-2);
+}
+
 /* ---------- Messages ---------- */
 .form-alert,
 .form-note {

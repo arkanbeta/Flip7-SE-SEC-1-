@@ -58,7 +58,10 @@ async function request(path, { method = 'GET', body } = {}) {
 // intent: 'login' | 'register'
 export const googleSignInUrl = (intent) => `${BASE_URL}/auth/google?intent=${encodeURIComponent(intent)}`;
 
-export const getHealth = () => request('/health');
+// Local development only: sign in as test player 1..8 without Google.
+export const devSignInUrl = (player) => `${BASE_URL}/auth/dev?player=${player}`;
+
+export const getHealth =() => request('/health');
 export const getMe = () => request('/auth/me');
 export const registerAccount = ({ nickname, avatar }) =>
   request('/auth/register', { method: 'POST', body: { nickname, avatar } });

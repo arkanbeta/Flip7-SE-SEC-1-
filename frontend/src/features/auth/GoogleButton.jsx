@@ -1,8 +1,30 @@
-import { googleSignInUrl } from '../../services/api.js';
+import { devSignInUrl, googleSignInUrl } from '../../services/api.js';
 
 // A normal link: the whole browser window goes to Google and comes back to the app.
 // (Google's sign-in cannot run in a pop-up/fetch; it must be a real navigation.)
+// Local development only (never in a production build or in tests): sign in as a
+// test player without Google. Needs DEV_LOGIN_ENABLED=true in backend/.env.
+const SHOW_DEV_LOGIN = import.meta.env.DEV && import.meta.env.MODE !== 'test';
+
 export default function GoogleButton({ intent }) {
+  return (
+    <>
+      <GoogleLink intent={intent} />
+      {SHOW_DEV_LOGIN && (
+        <p className="dev-login">
+          Local test players (no Google):{' '}
+          {[1, 2, 3, 4].map((n) => (
+            <a key={n} href={devSignInUrl(n)}>
+              Player {n}
+            </a>
+          ))}
+        </p>
+      )}
+    </>
+  );
+}
+
+function GoogleLink({ intent }) {
   return (
     <a className="google-button" href={googleSignInUrl(intent)}>
       <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">

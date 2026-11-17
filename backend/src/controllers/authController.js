@@ -62,6 +62,24 @@ export function createAuthController({ config, authService, userService, logger 
     }
   }
 
+  // GET /api/auth/dev?player=1..8   DEVELOPMENT ONLY (the route exists only when
+  // DEV_LOGIN_ENABLED=true and NODE_ENV is not production). Signs the browser in as a
+  // local test player, skipping Google, so the game can be played on one computer.
+  async function devLogin(req, res) {
+    if (!config.devLogin) throw new AppError(404, 'NOT_FOUND', 'Not found.');
+    const n = Number(req.query.player ?? 1);
+    const player = Number.isInteger(n) && n >= 1 && n <= 8 ? n : 1;
+    const identity = { googleId: `dev-local-${player}`, email: `player${player}@local.localhost` };
+
+    const existing = await userService.findByGoogleId(identity.googleId);
+    if (existing) {
+      await startAuthenticatedSession(req, existing.id);
+      return res.redirect(frontendUrl('/lobby'));
+    }
+    await startPendingSession(req, identity);
+    return res.redirect(frontendUrl('/create-account/profile', { from: 'login' }));
+  }
+
   // GET /api/auth/me - "who am I?" The frontend calls this on every page load.
   // Never returns 401 for visitors: { user: null } is a normal answer.
   async function me(req, res) {
@@ -122,5 +140,5 @@ export function createAuthController({ config, authService, userService, logger 
     res.status(204).end();
   }
 
-  return { googleStart, googleCallback, me, nicknameAvailable, register, logout };
+  return { googleStart, googleCallback, devLogin, me, nicknameAvailable, register, logout };
 }
