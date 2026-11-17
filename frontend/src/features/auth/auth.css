@@ -210,3 +210,22 @@
 .field__hint--neutral { color: var(--color-text-secondary); }
 .field__hint--success { color: var(--color-success-text); }
 .field__hint--error { color: var(--color-error-text); }
+
+/* ---------- Phones and short screens: a compact brand panel, the sign-in card in view ---------- */
+@media (max-width: 640px), (max-height: 500px) {
+  .auth-brand { gap: var(--space-2); padding: var(--space-4); }
+  .auth-brand__name { font-size: var(--text-2xl); }
+  .auth-brand__tagline { font-size: var(--text-sm); }
+  .hero-card { --card-w: 5rem; margin-top: var(--space-2); }
+  .auth-panel { padding: var(--space-4) var(--space-4) var(--space-5); }
+  .auth-card { padding: var(--space-4); }
+  .auth-card__subtitle { margin-bottom: var(--space-4); }
+  .profile-form { gap: var(--space-4); }
+  /* the "Create an account" / "Sign in" text link gets a comfortable touch height */
+  .auth-card__switch a { display: inline-block; padding: var(--space-2) 0; }
+}
+
+/* phones in landscape: brand and sign-in side by side instead of stacked */
+@media (max-height: 500px) and (min-width: 560px) and (max-width: 899px) {
+  .auth-layout { grid-template-columns: 0.8fr 1.2fr; }
+}
