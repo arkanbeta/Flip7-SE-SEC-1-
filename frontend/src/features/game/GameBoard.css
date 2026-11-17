@@ -443,19 +443,89 @@
 /* the winner heading receives focus when the match ends (for screen readers); no visible box needed */
 .panel--final h2:focus { outline: none; }
 
-/* ---- phones: the row stacks (name + points on top, cards below) and the choices stay reachable ---- */
-@media (max-width: 640px) {
-  .game { border-radius: var(--radius-lg); gap: var(--space-3); }
-  .game::before { inset: 6px; border-radius: calc(var(--radius-lg) - 4px); }
+/* ============================================================================
+   Phones (portrait up to 640px) and short screens (phones in landscape):
+   everything gets compact so the decision, your own hand and the other players
+   share the first screen. Desktop and tablet (above) are untouched.
+   ========================================================================== */
+@media (max-width: 640px), (max-height: 500px) {
+  .game { gap: var(--space-2); padding: var(--space-2); border-radius: var(--radius-lg); }
+  .game::before { inset: 5px; border-radius: calc(var(--radius-lg) - 4px); }
+
+  /* the deck and the round facts on one compact line (wraps on the narrowest phones) */
+  .game__bar { gap: var(--space-2); padding: var(--space-1) var(--space-2) 0; }
+  .deck { gap: var(--space-2); }
+  .deck__card { --card-w: 2.1rem; }
+  .deck__pile { width: calc(2.1rem + 10px); height: calc(2.1rem * 1.4 + 6px); }
+  .deck__number { font-size: 1.75rem; }
+  .game__facts { flex: 1 1 auto; flex-wrap: nowrap; justify-content: flex-end; gap: var(--space-1); }
+  .fact { flex: 0 1 auto; min-width: 0; padding: 0.2rem 0.55rem; border-radius: var(--radius-sm); }
+  .fact dt { font-size: 0.6875rem; }
+  .fact dd { overflow: hidden; text-overflow: ellipsis; font-size: var(--text-sm); }
+  .fact--round strong { font-size: var(--text-lg); }
+
+  /* panels: less padding, smaller type; the timer sits beside the heading */
+  .panel { gap: var(--space-2) var(--space-3); padding: var(--space-3); border-radius: var(--radius-md); }
+  .panel h2 { font-size: var(--text-lg); }
+  .panel__text { flex: 1 1 0; }
+  .panel__text p { font-size: var(--text-sm); line-height: 1.4; }
+  .panel--wait p { font-size: var(--text-sm); }
+  .timer { width: 3rem; height: 3rem; font-size: var(--text-base); }
+  /* your decision is placed after the players, so "sticky bottom" really pins it to the bottom of the
+     screen (thumb reach) while you scroll the table. Only the visual order changes, not the DOM. */
+  .panel--mine { position: sticky; bottom: var(--space-2); z-index: 5; order: 1; }
+  /* a drawn Action card: card and timer on top, the explanation, then who gets it */
+  .panel--action .panel__card { --card-w: 2.6rem; }
+  .panel--action .timer { margin-left: auto; }
+  .panel--action .panel__text { order: 1; flex: 1 1 100%; }
+  .panel--action .panel__buttons { order: 2; }
+
+  /* the players: your own row first (owner's choice), then everyone in seat order */
+  .seats { gap: 6px; }
+  .seat--me { order: -1; }
   .seat {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: 'who score' 'cards cards';
-    padding: var(--space-3);
+    gap: var(--space-1) var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
   }
-  .seat__cards { --seat-card-w: clamp(2.4rem, 11vw, 3rem); gap: 6px; }
-  .fact { min-width: 0; }
-  .deck__pile { transform: scale(0.85); transform-origin: left center; }
-  .panel--mine { position: sticky; bottom: var(--space-3); z-index: 5; }
+  /* Avatar sets its size inline, so the smaller phone size needs !important */
+  .seat__avatar .avatar { width: 2.125rem !important; height: 2.125rem !important; }
+  .seat__crown { top: -12px; width: 1.5rem; }
+  .seat__who { gap: var(--space-2); }
+  .seat__id { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 2px var(--space-2); }
+  .seat__name { font-size: var(--text-base); }
+  .seat__total { font-size: 1.5rem; }
+  .seat__round { font-size: var(--text-xs); }
+  .seat__goal { min-width: 4.5rem; height: 0.3rem; margin-top: 2px; }
+  .seat__cards { --seat-card-w: clamp(2.5rem, 10.5vw, 2.9rem); gap: 5px; }
+  /* no cards yet: a slim label instead of an empty card-sized box */
+  .seat__cards:has(.seat__empty) { min-height: 0; }
+  .seat__empty { width: auto; aspect-ratio: auto; padding: 0.1rem 0.6rem; font-size: var(--text-xs); border-radius: var(--radius-pill); }
+}
+
+/* short screens (landscape): smaller cards so a whole row fits under the header */
+@media (max-height: 500px) {
+  .seat__cards { --seat-card-w: 2.5rem; }
+}
+
+/* phones in portrait: Hit / Stay (and the player choices) share a full-width row, big thumb targets */
+@media (max-width: 540px) {
+  .panel__buttons { flex: 1 1 100%; gap: var(--space-2); }
+  .panel__buttons--big .btn { flex: 1 1 0; min-width: 0; min-height: 3rem; }
+  .panel--action .panel__buttons .btn { flex: 1 1 30%; min-width: 0; padding: 0 var(--space-2); }
+}
+
+/* large phones (431-640px) and small phones in landscape: room for one-line rows again */
+@media (min-width: 431px) and (max-width: 699px) {
+  .seat { grid-template-columns: minmax(7rem, 9.5rem) minmax(0, 1fr) auto; grid-template-areas: 'who cards score'; }
+  .seat__id { flex-direction: column; align-items: flex-start; }
+}
+
+/* wider phones in landscape: the players in two columns, to use the width */
+@media (max-height: 500px) and (min-width: 700px) {
+  .seats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* ============================================================================
@@ -664,4 +734,38 @@
   0%, 40% { box-shadow: var(--shadow-card); }
   50%, 70% { box-shadow: 0 0 0 3px #F0B7A6, 0 0 26px 4px rgb(240 183 166 / 0.9), var(--shadow-card); }
   100% { box-shadow: var(--shadow-card); }
+}
+
+/* ============================================================================
+   Phones and short screens: the round summary and the final results.
+   ========================================================================== */
+@media (max-width: 640px), (max-height: 500px) {
+  .scores { margin: var(--space-2) 0; font-size: var(--text-sm); }
+  .scores th, .scores td { padding: 0.35rem var(--space-2); }
+  .panel--final h2 { font-size: var(--text-xl); }
+
+  /* one compact row per player: rank and avatar on the left, name with its ready tag in the middle,
+     the points (and ranking points below them) on the right */
+  .standings { gap: var(--space-1); margin-top: var(--space-3); }
+  .standings li { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; align-items: center; gap: 0 var(--space-2); padding: var(--space-2); }
+  .standings li > .standings__rank, .standings li > .avatar { grid-row: 1 / span 2; }
+  .standings li > .standings__name { grid-column: 3; grid-row: 1; font-size: var(--text-sm); }
+  .standings li > .standings__points { grid-column: 4; grid-row: 1 / span 2; font-size: var(--text-base); }
+  .standings li > .tag { grid-column: 3; grid-row: 2; justify-self: start; }
+  .standings__rank { width: 1.5rem; height: 1.5rem; font-size: var(--text-sm); }
+  /* Avatar sets its size inline, so the smaller phone size needs !important */
+  .standings li > .avatar { width: 1.75rem !important; height: 1.75rem !important; }
+  .standings__ranking { font-size: var(--text-xs); }
+  /* members who were not in the match have no rank or points: avatar, name, ready tag */
+  .standings--others li { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .standings--others li > .avatar { grid-row: auto; }
+  .standings--others li > .standings__name, .standings--others li > .tag { grid-column: auto; grid-row: auto; justify-self: end; }
+  .standings--others li > .standings__name { justify-self: stretch; }
+
+  .rematch { margin-top: var(--space-4); gap: var(--space-2); }
+}
+
+/* phones in portrait: the rematch buttons are full width, easy to hit */
+@media (max-width: 540px) {
+  .rematch .btn { flex: 1 1 100%; white-space: normal; text-align: center; }
 }
