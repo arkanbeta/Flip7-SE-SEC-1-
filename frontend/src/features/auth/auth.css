@@ -1,6 +1,7 @@
 /* ---------- Page frame ---------- */
 .auth-layout {
   min-height: 100vh;
+  min-height: 100dvh; /* the visible height on phones (browser bars excluded) */
   display: grid;
   grid-template-columns: 1fr;
 }

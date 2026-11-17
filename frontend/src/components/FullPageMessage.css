@@ -1,5 +1,6 @@
 .full-page-message {
   min-height: 100vh;
+  min-height: 100dvh; /* the visible height on phones (browser bars excluded) */
   display: flex;
   flex-direction: column;
   align-items: center;
