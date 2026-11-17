@@ -131,6 +131,16 @@ describe('answering Hit or Stay', () => {
     expect(api.getCurrentRoom.mock.calls.length).toBeGreaterThan(1);
   });
 
+  it('too many moves too fast: says to wait a moment, not the server\'s "few minutes"', async () => {
+    api.sendGameAction.mockRejectedValue(new api.ApiError(429, 'RATE_LIMITED', 'Too many requests. Please wait a few minutes and try again.'));
+    renderRoom(makeRoom(makeGame()));
+    await userEvent.click(await screen.findByRole('button', { name: 'Hit' }));
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toMatch(/wait a moment/i);
+    expect(alert.textContent).not.toMatch(/minutes/i);
+    expect(api.getCurrentRoom.mock.calls.length).toBeGreaterThan(1);
+  });
+
   it('applies the new table the server sends back after a move', async () => {
     const after = makeGame({ seq: 6, decision: { id: 8, type: 'hit_or_stay', playerId: 2, card: null, options: null } });
     api.sendGameAction.mockResolvedValue({ room: makeRoom(after) });
