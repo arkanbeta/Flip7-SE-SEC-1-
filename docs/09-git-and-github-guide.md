@@ -18,7 +18,7 @@ git init
 git status            # check the list BEFORE adding anything
 ```
 
-**Check that no secret is about to be committed.** `git status` must *not* list `backend/.env` or `node_modules/`. The provided `.gitignore` already excludes `.env`, `.env.*` (but keeps `.env.example`), `node_modules/`, `dist/`, logs and editor folders.
+**Check that no secret is about to be committed.** `git status` must *not* list `backend/.env` or `node_modules/`. The provided `.gitignore` already excludes `.env`, `.env.*` (but keeps `.env.example`), `node_modules/`, `dist/`, logs, editor folders and the `graphify-out/` knowledge-graph output.
 
 ```bash
 git add .
