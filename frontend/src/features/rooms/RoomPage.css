@@ -55,3 +55,55 @@
 .room__badge { background: linear-gradient(180deg, var(--teal-600), var(--teal-700)); }
 .room__prompt { border-color: color-mix(in srgb, var(--ochre-500) 60%, var(--cream-300)); }
 .room__prompt h2 { color: var(--teal-800); }
+
+/* ---- during a match on phones and short screens: a slim header, the table starts at once ---- */
+@media (max-width: 640px), (max-height: 500px) {
+  .room:has(.game) { gap: var(--space-3); }
+  /* the "Game on" heading only repeats what the table shows: kept for screen readers only */
+  .room:has(.game) .room__top > div:first-child {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  .room:has(.game) .room__top { justify-content: flex-end; }
+  .room:has(.game) .room__actions { flex-wrap: nowrap; gap: var(--space-2); }
+  .room:has(.game) .room__actions .btn { padding: 0 var(--space-3); font-size: var(--text-sm); }
+}
+
+/* ---- the waiting room on phones and short screens ---- */
+@media (max-width: 640px), (max-height: 500px) {
+  .room:not(:has(.game)) { gap: var(--space-4); }
+  /* what needs an answer comes first: the host's "start now?" question (and any error) sits right
+     under the header, above the player list (visual order only; the DOM order is unchanged) */
+  .room:not(:has(.game)) > .room__connection { order: -3; }
+  .room:not(:has(.game)) > .room__top { order: -2; }
+  .room:not(:has(.game)) > .room__prompt,
+  .room:not(:has(.game)) > .form-error { order: -1; }
+
+  /* title on the left, a smaller room-code ticket on the right */
+  .room:not(:has(.game)) .room__top { flex-wrap: nowrap; align-items: center; gap: var(--space-3); }
+  .room:not(:has(.game)) .room__top h1 { font-size: var(--text-xl); }
+  .room__code { flex: none; padding: var(--space-2) var(--space-3); }
+  .room__code-value { font-size: var(--text-xl); letter-spacing: 0.1em; }
+  .room__code-label, .room__code-copy { font-size: var(--text-xs); }
+
+  .room__prompt, .room__notice { padding: var(--space-3) var(--space-4); }
+  .room__prompt h2, .room__notice h2 { font-size: var(--text-lg); }
+  .room__prompt-actions .btn { flex: 1 1 0; }
+
+  /* compact player cards */
+  .room__players { gap: var(--space-2); }
+  .room__player { gap: var(--space-2); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); }
+  /* Avatar sets its size inline, so the smaller phone size needs !important */
+  .room__player .avatar { width: 2.25rem !important; height: 2.25rem !important; }
+  .room__player-name { font-size: var(--text-base); }
+  .room__badge { padding: 0.05rem 0.5rem; font-size: var(--text-xs); }
+  .room__player--empty { min-height: 3.25rem; font-size: var(--text-sm); }
+}
+
+/* standard and large phones in portrait: the players in two columns (landscape keeps the wider grid) */
+@media (min-width: 360px) and (max-width: 640px) {
+  .room__players { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: dense; }
+  /* your own card spans both columns, so your name and the Host badge are never cut short */
+  .room__player--me { grid-column: 1 / -1; }
+  /* half-width cards: a long nickname wraps onto a second line instead of being cut off */
+  .room__player:not(.room__player--me) .room__player-name { white-space: normal; overflow-wrap: anywhere; line-height: 1.2; }
+}

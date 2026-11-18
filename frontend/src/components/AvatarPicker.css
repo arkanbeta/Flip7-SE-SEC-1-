@@ -47,3 +47,8 @@
   outline: 3px solid var(--color-primary);
   outline-offset: 3px;
 }
+
+/* phones: four avatars per row instead of three (still at least 56px each), so the form is shorter */
+@media (max-width: 640px) {
+  .avatar-picker__grid { grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr)); }
+}

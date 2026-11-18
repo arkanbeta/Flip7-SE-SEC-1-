@@ -87,7 +87,7 @@ If the room empties while a match is still running (the room closes), `hooks.onA
 - `game.integration.test.js` (31, real MySQL + sockets): start, moves over HTTP, wrong player, forged player id, double-click, malformed moves, rate limit, live push, leave confirmation, one-player-left, finished-match reporting, clocks (auto-Stay, next round) with short timers.
 - `matchLifecycle.test.js` (28, no database): finished match reported once, abandoned room, ready rules, creator rule, saving transaction with retries (fake pool).
 - `match.integration.test.js` (16, real MySQL): rows written and totals updated, leavers on 0, one match shared by all players, second match saved separately, ready validation/CSRF, rematch start, creator leaving on the results screen, takeover in the database, closing. Mutation checks (always promote, no points update, no takeover) all fail the suite.
-- Frontend `game.test.jsx` (42): the table, every kind of question, countdown, summary, results, leave dialog, live updates, event wording.
+- Frontend `game.test.jsx` (57): the table, every kind of question, countdown, summary, results, leave dialog, live updates, event wording.
 
 ## Not done yet (later phases)
 

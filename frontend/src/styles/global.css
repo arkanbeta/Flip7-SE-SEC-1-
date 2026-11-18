@@ -11,6 +11,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh; /* the visible height on phones (browser bars excluded) */
   background: var(--page-bg);
   background-color: var(--color-bg);
   background-attachment: fixed;
@@ -88,4 +89,9 @@ img {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* During a match a downward swipe must scroll, never pull-to-refresh the page. */
+html:has(.game) {
+  overscroll-behavior-y: none;
 }
