@@ -50,6 +50,11 @@ The backend refuses to start (with a clear message) if the environment variables
 
 ### 3. Start the frontend
 
+
+pyaz zor xosha
+
+
+
 ```bash
 cd frontend
 npm install
