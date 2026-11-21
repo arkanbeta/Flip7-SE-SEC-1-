@@ -1,27 +1,27 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Modal from '../../components/Modal.jsx';
-import Button from '../../components/Button.jsx';
-import { createRoom, getRoomModes } from '../../services/api.js';
-import { roomErrorMessage } from './roomMessages.js';
-import './RoomForms.css';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Modal from "../../components/Modal.jsx";
+import Button from "../../components/Button.jsx";
+import { createRoom, getRoomModes } from "../../services/api.js";
+import { roomErrorMessage } from "./roomMessages.js";
+import "./RoomForms.css";
 
-const CAPACITIES = [3, 4, 5, 6, 7]; // same limits as the backend (utils/roomRules.js)
+const CAPACITIES = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; // same limits as the backend (utils/roomRules.js)
 
 export default function CreateGameModal({ open, onClose }) {
   const navigate = useNavigate();
   const [modes, setModes] = useState([]);
   const [modeId, setModeId] = useState(null);
   const [maxPlayers, setMaxPlayers] = useState(4);
-  const [loadError, setLoadError] = useState('');
-  const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState("");
+  const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!open) return undefined;
     let cancelled = false;
-    setError('');
-    setLoadError('');
+    setError("");
+    setLoadError("");
     getRoomModes()
       .then(({ modes: list }) => {
         if (cancelled) return;
@@ -38,13 +38,13 @@ export default function CreateGameModal({ open, onClose }) {
     event.preventDefault();
     if (busy || modeId == null) return;
     setBusy(true);
-    setError('');
+    setError("");
     try {
       const { room } = await createRoom({ gameModeId: modeId, maxPlayers });
       onClose();
       navigate(`/rooms/${room.code}`);
     } catch (e) {
-      if (e.code === 'ALREADY_IN_OTHER_ROOM' && e.details?.code) {
+      if (e.code === "ALREADY_IN_OTHER_ROOM" && e.details?.code) {
         onClose();
         navigate(`/rooms/${e.details.code}`);
         return;
@@ -64,7 +64,12 @@ export default function CreateGameModal({ open, onClose }) {
             <legend>Game mode</legend>
             {modes.map((mode) => (
               <label key={mode.id} className="choice__option">
-                <input type="radio" name="mode" checked={modeId === mode.id} onChange={() => setModeId(mode.id)} />
+                <input
+                  type="radio"
+                  name="mode"
+                  checked={modeId === mode.id}
+                  onChange={() => setModeId(mode.id)}
+                />
                 <span>{mode.name}</span>
               </label>
             ))}
@@ -76,7 +81,12 @@ export default function CreateGameModal({ open, onClose }) {
           <div className="choice__row">
             {CAPACITIES.map((n) => (
               <label key={n} className="choice__chip">
-                <input type="radio" name="capacity" checked={maxPlayers === n} onChange={() => setMaxPlayers(n)} />
+                <input
+                  type="radio"
+                  name="capacity"
+                  checked={maxPlayers === n}
+                  onChange={() => setMaxPlayers(n)}
+                />
                 <span>{n}</span>
               </label>
             ))}
