@@ -6,11 +6,11 @@ A friendly online card game, not an admin dashboard: light surfaces, one strong 
 
 ## Design tokens (`frontend/src/styles/variables.css`)
 
-Everything visual comes from CSS variables, so the look can be changed in one file. Components never contain raw colours or sizes.
+Everything visual comes from CSS variables, so the look can be changed in one file. Components never contain raw colors or sizes.
 
 | Group | Tokens | Notes |
 | --- | --- | --- |
-| Palette | `--color-bg`, `--color-surface`, `--color-primary`, `--color-secondary`, `--color-text`, `--color-text-secondary`, `--color-border`, `--color-success`, `--color-warning`, `--color-error` | Exactly the colours in the project specification |
+| Palette | `--color-bg`, `--color-surface`, `--color-primary`, `--color-secondary`, `--color-text`, `--color-text-secondary`, `--color-border`, `--color-success`, `--color-warning`, `--color-error` | Exactly the colors in the project specification |
 | Tints | `--color-primary-soft`, `--color-error-soft`, ... | Computed from the palette with `color-mix()`, so they can never drift from it |
 | Type | `--font-display`, `--font-body`, `--text-sm` ... `--text-3xl` | Fredoka (rounded, friendly) for headings and card numbers; Nunito for reading text. Both are bundled via `@fontsource-variable`, so no request goes to Google Fonts |
 | Space / shape | `--space-1..7`, `--radius-sm/md/lg/pill` | One scale for the whole app |
@@ -21,7 +21,7 @@ Blue is for primary actions, teal for secondary emphasis, neutrals for content.
 
 ## Contrast audit (Phase 8)
 
-Ratios were computed from the tokens (WCAG 2.x). Body text, secondary text, button labels, links and the card numbers all pass 4.5:1 (text on page 13.7, secondary text 4.8, white on primary 4.9, primary on white 4.9). The brand **green, teal and orange are too light as small text on white** (3.1-3.3), so text uses the darker `--color-success-text`, `--color-secondary-text`, `--color-error-text` and `--color-warning-text` (all 4.6+ on white and on their soft tints); the base colours are kept for borders, icons and large shapes. Form fields and secondary buttons use `--color-field-border` (3.2:1) instead of the faint decorative `--color-border` (1.2:1), because a control's outline must be visible. Information is never carried by colour alone (statuses are also written: "Bust!", "Stayed", "Ready").
+Ratios were computed from the tokens (WCAG 2.x). Body text, secondary text, button labels, links and the card numbers all pass 4.5:1 (text on page 13.7, secondary text 4.8, white on primary 4.9, primary on white 4.9). The brand **green, teal and orange are too light as small text on white** (3.1-3.3), so text uses the darker `--color-success-text`, `--color-secondary-text`, `--color-error-text` and `--color-warning-text` (all 4.6+ on white and on their soft tints); the base colors are kept for borders, icons and large shapes. Form fields and secondary buttons use `--color-field-border` (3.2:1) instead of the faint decorative `--color-border` (1.2:1), because a control's outline must be visible. Information is never carried by color alone (statuses are also written: "Bust!", "Stayed", "Ready").
 
 ## Animation (Phase 8)
 
