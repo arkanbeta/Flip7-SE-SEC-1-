@@ -33,6 +33,7 @@ async function main() {
     sessionMiddleware: app.locals.sessionMiddleware,
     roomService: app.locals.roomService,
     manager: app.locals.roomManager,
+    isBot: app.locals.botService.isBot,
   });
 
   server.listen(config.port, () => {
@@ -47,6 +48,7 @@ async function main() {
     console.log(`${signal} received, shutting down...`);
     server.close(async () => {
       app.locals.realtime.close();
+      app.locals.botService.shutdown();
       app.locals.gameManager.shutdown();
       app.locals.roomManager.shutdown();
       sessionStore.close();

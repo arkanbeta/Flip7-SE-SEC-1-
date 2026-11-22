@@ -11,6 +11,7 @@ import { createMatchService } from './services/matchService.js';
 import { createRoomService } from './services/roomService.js';
 import { createRoomManager } from './realtime/roomManager.js';
 import { createGameManager } from './game/gameManager.js';
+import { createBotService } from './services/botService.js';
 import { createGoogleOAuthService } from './services/googleOAuthService.js';
 
 // Builds the Express app WITHOUT starting a server. Everything external is passed in
@@ -61,10 +62,14 @@ export function createApp({ config, pool, sessionStore, googleOAuth, roomManager
   const games = gameManager ?? createGameManager({ manager, turnMs: config.game.turnMs, roundEndMs: config.game.roundEndMs, logger });
   // Saving finished matches: the game manager reports a match once; the service writes it in
   // one transaction. The players keep seeing their results even if the save has to be retried.
+  // Computer players for "Fill empty seats with bots": seated and played through the same managers.
+  const bots = createBotService({ pool, manager, games, logger });
+  manager.hooks.isBot = bots.isBot; // a person is preferred over a bot when the host role moves on
   const matchService = createMatchService({ pool, logger });
   const alsoFinished = games.hooks.onFinished; // keep a hook that was injected (tests)
   const alsoAbandoned = games.hooks.onAbandoned;
   games.hooks.onFinished = (report) => {
+    bots.stripRanking(report.result); // owner's decision: bots earn no ranking points (before it is shown or saved)
     alsoFinished?.(report);
     const { room, result, startedAt, finishedAt } = report;
     matchService
@@ -79,7 +84,10 @@ export function createApp({ config, pool, sessionStore, googleOAuth, roomManager
       .catch((error) => logger.error(`Could not record the abandoned match of room ${room.code}:`, error));
   };
   app.locals.matchService = matchService;
-  const roomService = createRoomService({ pool, manager, games, generateCode: generateRoomCode, logger });
+  const roomService = createRoomService({ pool, manager, games, bots, generateCode: generateRoomCode, logger });
+  bots.hooks.setReady = (userId) => roomService.setReady(userId, true);
+  bots.hooks.leave = (userId) => roomService.leaveRoom(userId, { confirmed: true });
+  app.locals.botService = bots;
   manager.hooks.autoStart = roomService.autoStart; // works for injected managers too
   app.locals.roomManager = manager;
   app.locals.roomService = roomService;

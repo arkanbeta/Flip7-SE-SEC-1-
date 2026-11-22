@@ -27,6 +27,7 @@ export function attachRealtime({
   roomService,
   manager,
   graceMs = config.rooms?.disconnectGraceMs ?? DEFAULT_GRACE_MS,
+  isBot = () => false, // server-run bots (services/botService.js): no connection, no grace timer, nothing to push
   setTimer = (fn, ms) => setTimeout(fn, ms),
   clearTimer = (id) => clearTimeout(id),
   logger = console,
@@ -64,6 +65,7 @@ export function attachRealtime({
   }
 
   function startGrace(userId) {
+    if (isBot(userId)) return;
     if (graceTimers.has(userId) || connectionCount(userId) > 0) return;
     const timer = setTimer(async () => {
       graceTimers.delete(userId);
@@ -97,6 +99,7 @@ export function attachRealtime({
     const affected = new Set([...room.members.keys(), ...userIds]);
     const removed = type === 'kicked' || type === 'banned' ? type : undefined;
     for (const userId of affected) {
+      if (isBot(userId)) continue;
       push(userId, room.members.has(userId) ? undefined : removed);
       if (room.members.has(userId)) startGrace(userId);
     }

@@ -83,7 +83,7 @@ describe.skipIf(!integrationEnabled)('rooms (integration)', () => {
         isCreator: true, canStart: false, creatorId: owner.user.id,
         gameMode: { id: modeId, name: 'Normal' },
       });
-      expect(res.body.room.players).toEqual([{ id: owner.user.id, nickname: owner.user.nickname, avatar: 'fox', isCreator: true, isSpectator: false, canKick: false }]);
+      expect(res.body.room.players).toEqual([{ id: owner.user.id, nickname: owner.user.nickname, avatar: 'fox', isCreator: true, isSpectator: false, isBot: false, canKick: false }]);
       const row = await roomRow('CRTE22');
       expect(row).toMatchObject({ creator_id: owner.user.id, game_mode_id: modeId, max_players: 6, status: 'Waiting' });
     });

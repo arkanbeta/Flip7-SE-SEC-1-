@@ -81,6 +81,16 @@ If the room empties while a match is still running (the room closes), `hooks.onA
 - **Host button (owner's decision):** a rematch starts by itself when *every* member is ready, but the host can also press **Start now with the players who are ready** (`POST /api/rooms/current/rematch`, host only). It needs 3 ready players, the host counting as ready. Members who were not ready watch that match and can get ready for the one after.
 - **Spectators (owner's decision):** anyone with the room code can join while a match is being played and **watches** it until the next match, unless the room is **full** (then joining is refused with `ROOM_FULL`, even to watch). A spectator takes a seat (counts toward the room's capacity), sees the same table as the players, is not dealt in, is not saved in the match, and may leave without the "you lose your points" warning. On the results screen they become ordinary members and can press Play again. If the host leaves mid-match, a player is preferred as the next host; a spectator only if nobody else is left.
 
+## Computer players ("Fill empty seats with bots")
+
+In a waiting room the host sees **Fill N empty seats with bots** while there are free seats. `POST /api/rooms/current/fill-bots` counts the empty seats on the server and `services/botService.js` seats that many bots.
+
+- **Who they are:** ordinary `Users` rows whose `google_id` starts with `dev-bot-` (no Google account can), named `Bot_1`, `Bot_2`, ... with avatars from the allowlist. Free accounts are reused; missing ones are created. The developer script `scripts/bots.js` uses the same accounts.
+- **How they play:** seated with `manager.join` and playing through `games.act`, like any player, so the engine checks every move. The decision rules (`game/botStrategy.js`, shared with the script): stay at 5 number cards or 25 points unless a Second Chance covers the risk; Freeze / Flip Three go to the opponent with the best round; a spare Second Chance goes to the first player offered. Each move comes after a short pause (1.2 s) so people can follow.
+- **Owner's decisions:** bots earn **no ranking points** (set to 0 as the match ends, so the results screen and the database agree); they **stay for the rematch** and press "Play again" by themselves; the host can **kick** them like anyone else (a kicked bot is no longer played).
+- **Safety rules:** bots never open a connection, so the socket server gives them no grace timer (doc 06). When the host role moves on, a person is preferred over a bot. When only bots are left, they leave too and the room closes instead of playing forever.
+- Only bots seated by the server are played by it: bots run by `scripts/bots.js` keep playing through their own script.
+
 ## Tests
 
 - `flip7Game.test.js` (85): the deck, every rule above with hand-stacked decks (rulebook example 66 / 81 included), time-outs, leavers, and **450 randomly played full games** that check the invariants (finish, all 94 cards accounted for between rounds, winner has the top score, leavers on 0). It found a real bug (a leaver's Second Chance discarded twice).

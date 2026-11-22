@@ -35,6 +35,8 @@ You keep your seat for a **grace period** after your last connection drops (`ROO
 
 A player who creates a room over HTTP and never opens the page also gets the grace period, so no ghost rooms stay open.
 
+**Computer players** ("Fill empty seats with bots", doc 11) never open a connection. The socket server asks the bot service `isBot()` and gives them no grace timer (they would otherwise be removed after 30 seconds) and nothing to push.
+
 > The 30 seconds and the "leaving counts as leaving" behaviour are **my interim choice**. The rules document lists "may a player rejoin after disconnecting, and what happens if they do not return" as still open for the project owner. Phase 6 will need a real answer (for example, what happens to a disconnected player's turn). The value is one environment variable.
 
 ## In the browser

@@ -2,13 +2,15 @@ import { AppError } from '../utils/AppError.js';
 import { getDuplicateKey } from '../db/errors.js';
 import { generateRoomCode } from '../utils/roomCode.js';
 import { MIN_PLAYERS } from '../utils/roomRules.js';
+import { BOT_GOOGLE_PREFIX } from './botService.js';
 
 const MAX_CODE_ATTEMPTS = 10;
 
 // Business rules for rooms. It combines the two stores:
 //   - MySQL (GameRooms): the permanent record that a room exists, with its unique code
 //   - roomManager: the live in-memory state (players, timers)
-export function createRoomService({ pool, manager, games, generateCode = generateRoomCode, logger = console }) {
+// `bots` (services/botService.js) is optional: without it the "fill with bots" button is not offered.
+export function createRoomService({ pool, manager, games, bots = null, generateCode = generateRoomCode, logger = console }) {
   async function listModes() {
     const [rows] = await pool.query('SELECT game_mode_id, name, description FROM GameModes ORDER BY game_mode_id');
     return rows.map((row) => ({ id: row.game_mode_id, name: row.name, description: row.description }));
@@ -77,7 +79,7 @@ export function createRoomService({ pool, manager, games, generateCode = generat
   function loadUsers(room, ids) {
     const key = ids.join();
     if (room.usersQuery?.key !== key) {
-      const rows = pool.query('SELECT user_id, nickname, avatar FROM Users WHERE user_id IN (?)', [ids]).then(([users]) => users);
+      const rows = pool.query('SELECT user_id, nickname, avatar, google_id FROM Users WHERE user_id IN (?)', [ids]).then(([users]) => users);
       const done = () => {
         if (room.usersQuery?.rows === rows) room.usersQuery = null;
       };
@@ -110,12 +112,16 @@ export function createRoomService({ pool, manager, games, generateCode = generat
       creatorId: room.creatorId,
       isCreator,
       canStart: isCreator && room.status === 'Waiting' && room.members.size >= MIN_PLAYERS,
+      emptySeats: room.maxPlayers - room.members.size,
+      // Host only: the empty seats of a waiting room can be filled with computer players.
+      canFillBots: Boolean(bots) && isCreator && room.status === 'Waiting' && room.members.size < room.maxPlayers,
       players: ids.map((id) => ({
         id,
         nickname: byId.get(id)?.nickname ?? 'Unknown',
         avatar: byId.get(id)?.avatar ?? '',
         isCreator: id === room.creatorId,
         isSpectator: room.spectators.has(id),
+        isBot: Boolean(byId.get(id)?.google_id?.startsWith(BOT_GOOGLE_PREFIX)),
         // Host only: false greys out "Kick" for this player (banning is always possible).
         canKick: isCreator && id !== viewerId && !kickLocked(room, game, id),
       })),
@@ -242,6 +248,20 @@ export function createRoomService({ pool, manager, games, generateCode = generat
     return room;
   }
 
+  // The host fills every empty seat of the waiting room with computer players. The number of
+  // empty seats is counted here, at the moment of the request, never taken from the browser.
+  async function fillWithBots(userId) {
+    const room = manager.getRoomOfUser(userId);
+    if (!room) throw new AppError(404, 'NOT_IN_ROOM', 'You are not in a room.');
+    if (room.creatorId !== userId) throw new AppError(403, 'NOT_CREATOR', 'Only the room creator can do that.');
+    if (room.status !== 'Waiting') throw new AppError(409, 'ROOM_NOT_WAITING', 'The game has already started.');
+    const empty = room.maxPlayers - room.members.size;
+    if (empty <= 0) throw new AppError(409, 'ROOM_FULL', 'That room is full.');
+    if (!bots) throw new AppError(503, 'BOTS_UNAVAILABLE', 'Computer players are not available right now.');
+    await bots.fill(room.code, empty);
+    return getCurrentRoom(userId);
+  }
+
   // One move in the running game (Hit, Stay, or choosing a player). All checking is done by
   // the rules engine; the user id comes from the session.
   async function gameAction(userId, action) {
@@ -274,6 +294,6 @@ export function createRoomService({ pool, manager, games, generateCode = generat
 
   return {
     listModes, createRoom, joinRoom, getCurrentRoom, leaveRoom, removePlayer,
-    startGame, respondToStartPrompt, autoStart, gameAction, setReady, startRematchWithReady, clearAllRooms,
+    startGame, respondToStartPrompt, autoStart, gameAction, setReady, startRematchWithReady, clearAllRooms, fillWithBots,
   };
 }

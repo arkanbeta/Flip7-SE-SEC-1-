@@ -86,5 +86,7 @@ export const setReady = (ready) => request('/rooms/current/ready', { method: 'PO
 // Host only, results screen: start the next match with the players who are ready; the rest watch.
 export const startRematch = () => request('/rooms/current/rematch', { method: 'POST' });
 export const startGame = () => request('/rooms/current/start', { method: 'POST' });
+// Host only, waiting room: computer players take every empty seat (the server counts them).
+export const fillWithBots = () => request('/rooms/current/fill-bots', { method: 'POST' });
 export const answerStartPrompt = (answer) =>
   request('/rooms/current/start-response', { method: 'POST', body: { answer } });

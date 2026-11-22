@@ -21,7 +21,7 @@ vi.mock('../services/api.js', async (importOriginal) => ({
   ...(await importOriginal()),
   getMe: vi.fn(), getProfile: vi.fn(), getMyMatches: vi.fn(),
   getCurrentRoom: vi.fn(), getRoomModes: vi.fn(), createRoom: vi.fn(), joinRoom: vi.fn(),
-  leaveRoom: vi.fn(), startGame: vi.fn(), answerStartPrompt: vi.fn(), removePlayer: vi.fn(),
+  leaveRoom: vi.fn(), startGame: vi.fn(), answerStartPrompt: vi.fn(), removePlayer: vi.fn(), fillWithBots: vi.fn(),
 }));
 
 const USER = { id: 1, nickname: 'Maya_1', email: 'm@example.com', avatar: 'fox', totalPoints: 0 };
@@ -195,6 +195,36 @@ describe('room page', () => {
     await userEvent.click(await screen.findByRole('button', { name: /leave room/i }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/lobby'));
     expect(api.leaveRoom).toHaveBeenCalled();
+  });
+});
+
+describe('host: fill empty seats with bots', () => {
+  it('offers the host to fill the empty seats, says how many, and shows the bots it adds', async () => {
+    api.getCurrentRoom.mockResolvedValue({ room: makeRoom({ canFillBots: true, emptySeats: 2 }) });
+    const filled = makeRoom({
+      playerCount: 4, canFillBots: false, emptySeats: 0, version: 2,
+      players: [player(1, 'Maya_1', true), player(2, 'Sam'), { ...player(3, 'Bot_1'), isBot: true }, { ...player(4, 'Bot_2'), isBot: true }],
+    });
+    api.fillWithBots.mockResolvedValue({ room: filled });
+    renderAt('/rooms/ABC234');
+    await userEvent.click(await screen.findByRole('button', { name: 'Fill 2 empty seats with bots' }));
+    expect(api.fillWithBots).toHaveBeenCalled();
+    await screen.findByText('Bot_2');
+    expect(screen.getAllByText('Bot', { selector: '.room__badge--bot' })).toHaveLength(2);
+    expect(screen.queryByRole('button', { name: /with bots/i })).toBeNull(); // the room is full now
+  });
+
+  it('says "seat" for a single empty seat', async () => {
+    api.getCurrentRoom.mockResolvedValue({ room: makeRoom({ canFillBots: true, emptySeats: 1 }) });
+    renderAt('/rooms/ABC234');
+    expect(await screen.findByRole('button', { name: 'Fill 1 empty seat with bots' })).toBeTruthy();
+  });
+
+  it('guests are not offered the button', async () => {
+    api.getCurrentRoom.mockResolvedValue({ room: makeRoom({ isCreator: false, creatorId: 2, canFillBots: false, emptySeats: 2 }) });
+    renderAt('/rooms/ABC234');
+    await screen.findByText('Sam');
+    expect(screen.queryByRole('button', { name: /with bots/i })).toBeNull();
   });
 });
 

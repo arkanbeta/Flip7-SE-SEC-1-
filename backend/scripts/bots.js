@@ -8,12 +8,16 @@
 // The bots then use the normal HTTP API (joining, moves, "Play again") exactly like a
 // browser, and listen on Socket.IO for their turn. Ctrl+C makes them leave the room.
 //
+// For bots inside the app itself, use the host's "Fill empty seats with bots" button instead
+// (services/botService.js): it needs no script and also works in production.
+//
 // Refuses to run with NODE_ENV=production.
 import 'dotenv/config';
 import crypto from 'node:crypto';
 import { io } from 'socket.io-client';
 import { loadConfig } from '../src/config/env.js';
 import { createPool } from '../src/db/pool.js';
+import { chooseMove } from '../src/game/botStrategy.js';
 
 const config = loadConfig();
 if (config.isProduction) {
@@ -63,24 +67,7 @@ async function createSession(userId) {
   return { sid, csrfToken, cookie: `flip7.sid=${encodeURIComponent(`s:${sid}.${signature}`)}` };
 }
 
-const score = (game, id) => game.players.find((p) => p.id === id)?.roundScore ?? 0;
-
-// Simple strategy: stay once the hand is worth a fair amount, otherwise hit.
-function chooseMove(game, me) {
-  const d = game.decision;
-  const mine = game.players.find((p) => p.id === me);
-  if (d.type === 'hit_or_stay') {
-    const risky = mine.numbers.length >= 5 || mine.roundScore >= 25;
-    return { type: risky && !mine.hasSecondChance ? 'stay' : 'hit' };
-  }
-  if (d.type === 'choose_target') {
-    // Freeze / Flip Three: aim at the opponent with the best round so far.
-    const others = d.options.filter((id) => id !== me);
-    const pick = others.sort((a, b) => score(game, b) - score(game, a))[0] ?? me;
-    return { type: 'target', targetId: pick };
-  }
-  return { type: 'gift', targetId: d.options[0] };
-}
+// How a bot decides lives in src/game/botStrategy.js (shared with the server's own bots).
 
 async function startBot(n) {
   const userId = await ensureBotUser(n);
@@ -123,7 +110,7 @@ async function startBot(n) {
     }
     const game = room.game;
     const d = game?.decision;
-    if (!d || d.playerId !== userId || busy || lastAnswered === d.id) return;
+    if (!d || d.playerId !== userId || d.type === 'flip_three_draw' || busy || lastAnswered === d.id) return;
     busy = true;
     lastAnswered = d.id;
     await sleep(THINK_MS);
