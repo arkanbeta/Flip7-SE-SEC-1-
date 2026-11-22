@@ -5,7 +5,7 @@
 // The five domain tables from the supplied schema (names are case-sensitive on Linux).
 export const REQUIRED_TABLES = ['Users', 'GameModes', 'MatchHistories', 'MatchPlayers', 'GameRooms'];
 
-// CHECK constraints (room capacity 3-7) are only enforced from MySQL 8.0.16.
+// CHECK constraints (room capacity 3-12) are only enforced from MySQL 8.0.16.
 const MIN_VERSION = [8, 0, 16];
 
 export function parseMysqlVersion(versionString) {

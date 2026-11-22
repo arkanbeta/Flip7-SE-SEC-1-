@@ -8,7 +8,7 @@ This page records **exactly what the project needs and what it was built and tes
 | --- | --- | --- | --- |
 | **Node.js** | 20 | v22.23.4 | Modern ES modules, `node --watch`, and what Vite and Vitest require |
 | **npm** | 9 | 10.9.9 | Comes with Node; lock files (`package-lock.json`) were created with this version |
-| **MySQL** | **8.0.16** | 8.0.46-0ubuntu0.24.04.4 | Earlier versions do not enforce `CHECK` constraints (room capacity 3-7) and lack the `utf8mb4_0900_ai_ci` collation used by the schema |
+| **MySQL** | **8.0.16** | 8.0.46-0ubuntu0.24.04.4 | Earlier versions do not enforce `CHECK` constraints (room capacity 3-12) and lack the `utf8mb4_0900_ai_ci` collation used by the schema |
 | **Git** | any recent | - | Version control (see the Git guide, added in Phase 8) |
 
 **Not supported:** MariaDB (different collations and `CHECK` behaviour; the backend refuses to start on it), MySQL 5.7, Node 18 or older.

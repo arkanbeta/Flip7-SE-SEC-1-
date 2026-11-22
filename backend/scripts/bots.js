@@ -22,7 +22,7 @@ if (config.isProduction) {
 }
 
 const code = (process.argv[2] ?? '').trim().toUpperCase();
-const count = Math.min(Math.max(Number(process.argv[3] ?? 2), 1), 6);
+const count = Math.min(Math.max(Number(process.argv[3] ?? 2), 1), 12);
 if (!code) {
   console.error('Usage: node scripts/bots.js <ROOM_CODE> [number of bots]');
   process.exit(1);
@@ -30,7 +30,8 @@ if (!code) {
 
 const BASE = `http://localhost:${config.port}`;
 const THINK_MS = 1200; // so humans can follow what the bots do
-const AVATARS = ['owl', 'frog', 'panda', 'koala', 'raccoon', 'penguin'];
+// only ids from the app's avatar allowlist (backend/src/utils/avatars.js): anything else shows as a blank circle
+const AVATARS = ['owl', 'frog', 'panda', 'koala', 'raccoon', 'penguin', 'cat', 'fox', 'bear', 'lion', 'mouse', 'pig', 'rabbit', 'chick'];
 const pool = createPool(config.db);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

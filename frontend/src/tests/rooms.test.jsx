@@ -61,13 +61,13 @@ describe('create dialog', () => {
     return screen.findByRole('dialog', { name: /create a game/i });
   }
 
-  it('hides the mode choice while there is only one mode, offers 3-7 players and sends the choice, then opens the room', async () => {
+  it('hides the mode choice while there is only one mode, offers 3-12 players and sends the choice, then opens the room', async () => {
     api.createRoom.mockResolvedValue({ room: makeRoom({ maxPlayers: 6 }) });
     api.getCurrentRoom.mockResolvedValue({ room: makeRoom({ maxPlayers: 6 }) });
     const dialog = await open();
     await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Create room' }).disabled).toBe(false)); // the mode has loaded
     expect(within(dialog).queryByText('Game mode')).toBeNull();
-    expect(within(dialog).getAllByRole('radio', { name: /^[3-7]$/ })).toHaveLength(5);
+    expect(within(dialog).getAllByRole('radio', { name: /^([3-9]|1[0-2])$/ })).toHaveLength(10);
     await userEvent.click(within(dialog).getByRole('radio', { name: '6' }));
     await userEvent.click(within(dialog).getByRole('button', { name: 'Create room' }));
     await waitFor(() => expect(api.createRoom).toHaveBeenCalledWith({ gameModeId: 1, maxPlayers: 6 }));

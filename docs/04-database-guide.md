@@ -26,7 +26,7 @@ The application checks rules first (friendly errors), but the database is the **
 
 - **Room codes:** two simultaneous requests may generate the same code. Both pass an in-app check, but `UNIQUE (room_code)` lets only one `INSERT` succeed; the other gets `ER_DUP_ENTRY`, and the service generates a new code and retries.
 - **Nicknames:** same technique with `UNIQUE (nickname)`.
-- **Capacity:** `CHECK (max_players BETWEEN 3 AND 7)` rejects invalid values even if validation has a bug. Verified by an integration test (MySQL error 3819).
+- **Capacity:** `CHECK (max_players BETWEEN 3 AND 12)` rejects invalid values even if validation has a bug. Verified by an integration test (MySQL error 3819).
 - **One result per player per match:** `UNIQUE (match_id, user_id)`.
 
 ## The `sessions` table (infrastructure, not a domain entity)
@@ -77,6 +77,17 @@ await withTransaction(pool, async (conn) => {
 ## Cleanup on restart
 
 `GameRooms` mirrors rooms that exist in server memory. If the backend restarts, memory is empty but the table is not, so all `GameRooms` rows are deleted at startup (implemented with the room system).
+
+## Changing an existing database
+
+`schema.sql` only shapes a **new** database. When it changes, an existing one must be changed by hand, as the MySQL admin (`root`): the app's own `flip7_app` user may not alter tables, on purpose. The room limit going from 7 to 12 players needs, once:
+
+```sql
+USE flip7_online;
+ALTER TABLE GameRooms
+  DROP CHECK chk_room_capacity,
+  ADD CONSTRAINT chk_room_capacity CHECK (max_players BETWEEN 3 AND 12);
+```
 
 ## Setup recap
 

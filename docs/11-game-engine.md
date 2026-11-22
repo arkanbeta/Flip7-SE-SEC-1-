@@ -53,7 +53,7 @@ The rules document does not cover these. They are sensible defaults, listed so t
 3. **Only one player left** after others leave: the match ends and that player wins with the points from *completed* rounds; the unfinished round is not scored.
 4. **A leaver in the pause between rounds** can decide a tie for the lead (the remaining top player wins immediately).
 5. **Pause between rounds:** 8 seconds (`GAME_ROUND_END_SECONDS`) to read the scores; the next round then starts by itself.
-6. **Empty deck and discard pile** at the same time (cannot happen with 94 cards and at most 7 players) ends the round instead of hanging.
+6. **Empty deck and discard pile** at the same time (very unlikely, but possible with 12 players holding many cards at once) ends the round instead of hanging.
 7. A match with **2 players** (after leavers) continues normally, although the tabletop game starts at 3. The room still needs 3 players to *start*.
 8. **Hits / busts** recorded for the match history count each Hit the player chose and each bust (Phase 7 stores them in `MatchPlayers`).
 

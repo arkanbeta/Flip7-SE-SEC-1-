@@ -14,7 +14,7 @@ Flip 7 Online lets friends play Flip 7 together in a browser. One player creates
 | Profile with stats and match history | Statistics that depend on rules not yet supplied |
 | Real-time play over Socket.IO | A game engine or Redis (until rules / scaling require them) |
 
-The room player limits are fixed: **minimum 3**, **maximum 7**. The creator picks the capacity (3-7); the minimum is not configurable.
+The room player limits are fixed: **minimum 3**, **maximum 12**. The creator picks the capacity (3-12); the minimum is not configurable.
 
 ## Roadmap
 

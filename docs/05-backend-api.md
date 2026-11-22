@@ -83,7 +83,7 @@ The user always comes from the session, never from the request body. Every room 
 |---|---|---|
 | `GET /api/rooms/modes` | Predefined game modes (Normal only for now) | |
 | `GET /api/rooms/current` | The room you are in, or `{ room: null }` | |
-| `POST /api/rooms` `{gameModeId, maxPlayers 3-7}` | Create a room and become its creator (201) | 400 validation, 409 `ALREADY_IN_OTHER_ROOM` (`details.code` = that room), 503 `ROOM_CODE_UNAVAILABLE` |
+| `POST /api/rooms` `{gameModeId, maxPlayers 3-12}` | Create a room and become its creator (201) | 400 validation, 409 `ALREADY_IN_OTHER_ROOM` (`details.code` = that room), 503 `ROOM_CODE_UNAVAILABLE` |
 | `POST /api/rooms/join` `{code}` | Join by code (case and spaces ignored). Joining your own room again is harmless | 400 `INVALID_ROOM_CODE`, 404 `ROOM_NOT_FOUND`, 409 `ROOM_FULL`, `ALREADY_IN_OTHER_ROOM`. Joining a room whose match is running makes you a spectator (until the next match) as long as there is a free seat |
 | `POST /api/rooms/current/leave` `{confirm?: true}` | Leave. Returns `{ closed }`. While a match is running it needs `confirm: true` (leaving then means 0 points) | 404 `NOT_IN_ROOM`, 409 `LEAVE_CONFIRMATION_REQUIRED` |
 | `POST /api/rooms/current/ready` `{ready: boolean}` | Results screen only: say whether you want another match. When every remaining player (3 or more) is ready a new match starts. Rate limited like game moves. Returns `{ room }` | 400 validation, 404 `NOT_IN_ROOM`, 409 `MATCH_NOT_OVER` |
