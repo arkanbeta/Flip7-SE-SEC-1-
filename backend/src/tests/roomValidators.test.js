@@ -9,10 +9,10 @@ const fieldOf = (fn) => {
 };
 
 describe('validateCreateRoom', () => {
-  it.each([3, 4, 5, 6, 7])('accepts capacity %i', (maxPlayers) => {
+  it.each([3, 4, 5, 6, 7, 8, 9, 10, 11, 12])('accepts capacity %i', (maxPlayers) => {
     expect(validateCreateRoom({ gameModeId: 1, maxPlayers })).toEqual({ gameModeId: 1, maxPlayers });
   });
-  it.each([2, 8, 0, -1, 3.5, '5', null, undefined, NaN])('rejects capacity %j (limits are fixed 3-7)', (maxPlayers) => {
+  it.each([2, 13, 0, -1, 3.5, '5', null, undefined, NaN])('rejects capacity %j (limits are fixed 3-12)', (maxPlayers) => {
     expect(fieldOf(() => validateCreateRoom({ gameModeId: 1, maxPlayers }))).toBe('maxPlayers');
   });
   it.each([0, -1, 1.5, '1', null, undefined])('rejects game mode %j', (gameModeId) => {

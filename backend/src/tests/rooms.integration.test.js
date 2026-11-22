@@ -83,12 +83,12 @@ describe.skipIf(!integrationEnabled)('rooms (integration)', () => {
         isCreator: true, canStart: false, creatorId: owner.user.id,
         gameMode: { id: modeId, name: 'Normal' },
       });
-      expect(res.body.room.players).toEqual([{ id: owner.user.id, nickname: owner.user.nickname, avatar: 'fox', isCreator: true, isSpectator: false, canKick: false }]);
+      expect(res.body.room.players).toEqual([{ id: owner.user.id, nickname: owner.user.nickname, avatar: 'fox', isCreator: true, isSpectator: false, isBot: false, canKick: false }]);
       const row = await roomRow('CRTE22');
       expect(row).toMatchObject({ creator_id: owner.user.id, game_mode_id: modeId, max_players: 6, status: 'Waiting' });
     });
 
-    it.each([2, 8, 3.5, '5', null])('rejects capacity %j', async (maxPlayers) => {
+    it.each([2, 13, 3.5, '5', null])('rejects capacity %j', async (maxPlayers) => {
       const [owner] = await users(1);
       const res = await post(owner, '', { gameModeId: modeId, maxPlayers });
       expect(res.status).toBe(400);
@@ -99,7 +99,7 @@ describe.skipIf(!integrationEnabled)('rooms (integration)', () => {
     it('accepts both ends of the allowed range', async () => {
       const [a, b] = await users(2);
       expect((await create(a, 3)).status).toBe(201);
-      expect((await create(b, 7)).status).toBe(201);
+      expect((await create(b, 12)).status).toBe(201);
     });
 
     it('rejects a missing or unknown game mode', async () => {

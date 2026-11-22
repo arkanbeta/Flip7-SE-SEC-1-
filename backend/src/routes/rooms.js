@@ -15,6 +15,7 @@ export function createRoomsRouter({ controller, limiters }) {
   router.post('/current/start', limiters.action, controller.start);
   router.post('/current/start-response', limiters.action, controller.startResponse);
   router.post('/current/game/action', limiters.action, controller.gameAction);
+  router.post('/current/fill-bots', limiters.action, controller.fillBots); // host only: computer players take the empty seats
   router.post('/current/ready', limiters.action, controller.ready);
   router.post('/current/rematch', limiters.action, controller.rematch);
   return router;

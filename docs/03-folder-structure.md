@@ -51,7 +51,7 @@ Every folder exists for a reason. Folders are created in the phase that first ne
 | `realtime/roomManager.js` | 4 | In-memory live rooms: members, status, start-prompt timers (synchronous, so every change is atomic) |
 | `realtime/socketServer.js` | 5 | Authenticated Socket.IO server: pushes each player's room state, disconnect grace period |
 | `services/roomService.js` | 4 | Joins the manager and the database (GameRooms rows, unique-code retry, auto-start save) |
-| `validators/roomValidators.js`, `utils/roomRules.js`, `utils/roomCode.js` | 4 | Input checks, 3-7 limits, secure 6-character code generator |
+| `validators/roomValidators.js`, `utils/roomRules.js`, `utils/roomCode.js` | 4 | Input checks, 3-12 limits, secure 6-character code generator |
 | `controllers/roomController.js`, `routes/rooms.js` | 4 | Room endpoints |
 | `services/matchService.js` | 7 | Saves a finished match (history, player rows, total points) in one transaction, with retries; records abandoned matches |
 | `realtime/` | Phase 5 | Socket.IO setup, authentication, event handlers, `RoomManager` |

@@ -857,9 +857,9 @@ describe('random whole games (the rules hold up under any play)', () => {
     return g;
   }
 
-  it('300 games with 2-7 players always finish, with consistent results', () => {
+  it('300 games with 2-12 players always finish, with consistent results', () => {
     for (let seed = 1; seed <= 300; seed += 1) {
-      const g = playRandomGame(seed, 2 + (seed % 6));
+      const g = playRandomGame(seed, 2 + (seed % 11));
       const { result } = g;
       expect(result.winnerIds.length).toBeGreaterThan(0);
       const best = Math.max(...result.standings.map((x) => x.finalPoints));

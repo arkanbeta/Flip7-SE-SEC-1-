@@ -9,7 +9,7 @@ export function sessionCookieOptions(config) {
     httpOnly: true, // JavaScript in the page can never read the session cookie
     secure: config.isProduction, // HTTPS only in production
     // "lax" still lets the cookie come back after Google redirects to us (a top-level
-    // GET) but blocks it on cross-site POSTs, which is the first CSRF defence.
+    // GET) but blocks it on cross-site POSTs, which is the first CSRF defense.
     sameSite: 'lax',
     path: '/',
   };

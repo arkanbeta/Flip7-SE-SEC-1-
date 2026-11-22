@@ -167,7 +167,8 @@ export function createRoomManager({
     if (wasCreator && !onResultsScreen) {
       // Map keeps join order: the longest-present player; someone who is only watching is a last resort
       const ids = [...room.members.keys()];
-      newCreatorId = ids.find((id) => !room.spectators.has(id)) ?? ids[0];
+      // a person is preferred over a server-run bot (hooks.isBot, set in app.js)
+      newCreatorId = ids.find((id) => !room.spectators.has(id) && !hooks.isBot?.(id)) ?? ids.find((id) => !room.spectators.has(id)) ?? ids[0];
       room.creatorId = newCreatorId;
     }
     evaluatePrompt(room);
@@ -291,7 +292,8 @@ export function createRoomManager({
     if (playerIds.length < MIN_PLAYERS) return null;
     let newCreatorId = null;
     if (!room.members.has(room.creatorId)) {
-      newCreatorId = playerIds[0]; // the longest-present player who is taking part
+      // the longest-present player who is taking part, a person before a bot
+      newCreatorId = playerIds.find((id) => !hooks.isBot?.(id)) ?? playerIds[0];
       room.creatorId = newCreatorId;
     }
     room.spectators = new Set([...room.members.keys()].filter((id) => !playerIds.includes(id)));

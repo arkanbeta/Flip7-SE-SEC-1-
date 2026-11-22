@@ -6,7 +6,7 @@ import { createRoom, getRoomModes } from '../../services/api.js';
 import { roomErrorMessage } from './roomMessages.js';
 import './RoomForms.css';
 
-const CAPACITIES = [3, 4, 5, 6, 7]; // same limits as the backend (utils/roomRules.js)
+const CAPACITIES = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; // same limits as the backend (utils/roomRules.js)
 
 export default function CreateGameModal({ open, onClose }) {
   const navigate = useNavigate();

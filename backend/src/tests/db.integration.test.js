@@ -62,7 +62,7 @@ describe.skipIf(!enabled)('database (integration)', () => {
     expect(await countModes()).toBe(1);
   });
 
-  it('enforces the room capacity CHECK (3-7) and the unique room code', async () => {
+  it('enforces the room capacity CHECK (3-12) and the unique room code', async () => {
     const [user] = await pool.query(
       'INSERT INTO Users (google_id, email, nickname, avatar) VALUES (?, ?, ?, ?)',
       [`g_${modeName}`, `${modeName}@example.test`, `t${Date.now() % 1e9}`, 'avatar-test']
@@ -77,7 +77,7 @@ describe.skipIf(!enabled)('database (integration)', () => {
     const code = `T${String(Date.now()).slice(-6)}`;
     try {
       await expect(insertRoom(`${code}A`, 2)).rejects.toMatchObject({ errno: 3819 }); // CHECK violated
-      await expect(insertRoom(`${code}B`, 8)).rejects.toMatchObject({ errno: 3819 });
+      await expect(insertRoom(`${code}B`, 13)).rejects.toMatchObject({ errno: 3819 });
       await insertRoom(code, 5);
       await expect(insertRoom(code.toLowerCase(), 5)).rejects.toMatchObject({ code: 'ER_DUP_ENTRY' });
     } finally {

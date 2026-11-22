@@ -79,7 +79,7 @@ Before listening, the backend confirms: MySQL (not MariaDB) at version 8.0.16 or
 
 ### Added in Phase 2
 
-- **Sessions in MySQL** (`express-session` + `express-mysql-session`): the browser holds an opaque `HttpOnly` cookie; the data lives in the `sessions` table, so logins survive backend restarts. A fresh session id is issued at login (session-fixation defence).
+- **Sessions in MySQL** (`express-session` + `express-mysql-session`): the browser holds an opaque `HttpOnly` cookie; the data lives in the `sessions` table, so logins survive backend restarts. A fresh session id is issued at login (session-fixation defense).
 - **CSRF protection, default-deny:** every non-GET request under `/api` needs the `X-CSRF-Token` header (token stored in the session, learned via `GET /api/auth/me`), and a browser `Origin` header, if present, must be our frontend. Because it is applied in `routes/index.js` to everything after the session middleware, new endpoints are protected automatically.
 - **Rate limiting** (`express-rate-limit`) on sign-in, the OAuth callback, account creation, and nickname lookups. In-memory per IP: fine for one backend instance.
 - **Google OAuth** with `state`, `nonce` and server-side ID-token verification; see `05-backend-api.md` for the step-by-step flow and what each safeguard stops.

@@ -5,7 +5,7 @@ import Avatar from '../../components/Avatar.jsx';
 import Button from '../../components/Button.jsx';
 import { LoadingScreen } from '../../components/FullPageMessage.jsx';
 import ManagePlayersDialog from './ManagePlayersDialog.jsx';
-import { answerStartPrompt, leaveRoom, removePlayer, sendGameAction, setReady, startGame, startRematch } from '../../services/api.js';
+import { answerStartPrompt, fillWithBots, leaveRoom, removePlayer, sendGameAction, setReady, startGame, startRematch } from '../../services/api.js';
 import { useAuth } from '../../hooks/useAuth.js';
 import GameBoard from '../game/GameBoard.jsx';
 import LeaveMatchDialog from '../game/LeaveMatchDialog.jsx';
@@ -186,6 +186,15 @@ export default function RoomPage() {
         </p>
       )}
 
+      {/* host only: computer players take the empty seats (secondary: starting stays the main action) */}
+      {room.canFillBots && (
+        <div className="room__fill">
+          <Button variant="secondary" onClick={() => act(fillWithBots)} disabled={busy}>
+            Fill {room.emptySeats} empty {room.emptySeats === 1 ? 'seat' : 'seats'} with bots
+          </Button>
+        </div>
+      )}
+
       <ul className="room__players" aria-label="Players">
         {room.players.map((p) => (
           <li key={p.id} className={`room__player${p.id === user.id ? ' room__player--me' : ''}`}>
@@ -195,6 +204,7 @@ export default function RoomPage() {
               {p.id === user.id && <span className="room__you"> (you)</span>}
             </span>
             {p.isCreator && <span className="room__badge">Host</span>}
+            {p.isBot && <span className="room__badge room__badge--bot">Bot</span>}
           </li>
         ))}
         {Array.from({ length: room.maxPlayers - room.playerCount }, (_, i) => (

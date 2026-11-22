@@ -34,6 +34,9 @@ export function createRoomController({ roomService }) {
     async rematch(req, res) {
       res.json({ room: await roomService.startRematchWithReady(req.userId) });
     },
+    async fillBots(req, res) {
+      res.json({ room: await roomService.fillWithBots(req.userId) });
+    },
     async ready(req, res) {
       res.json({ room: await roomService.setReady(req.userId, validateReady(req.body).ready) });
     },

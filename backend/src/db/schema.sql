@@ -97,7 +97,7 @@ CREATE TABLE GameRooms (
     UNIQUE (room_code),
 
     CONSTRAINT chk_room_capacity
-        CHECK (max_players BETWEEN 3 AND 7),
+        CHECK (max_players BETWEEN 3 AND 12),
 
     CONSTRAINT fk_room_creator
         FOREIGN KEY (creator_id)

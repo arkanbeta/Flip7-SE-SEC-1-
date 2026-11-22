@@ -107,3 +107,10 @@
   /* half-width cards: a long nickname wraps onto a second line instead of being cut off */
   .room__player:not(.room__player--me) .room__player-name { white-space: normal; overflow-wrap: anywhere; line-height: 1.2; }
 }
+
+/* ---- computer players: the "fill with bots" button and the Bot badge ---- */
+.room__fill { display: flex; }
+.room__badge.room__badge--bot { color: var(--color-text); background: var(--cream-200); border: 1px solid var(--color-field-border); }
+@media (max-width: 540px) {
+  .room__fill .btn { flex: 1 1 100%; }
+}
