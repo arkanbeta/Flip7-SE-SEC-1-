@@ -8,7 +8,10 @@ import { PlusCircleIcon, EnterIcon, BookIcon } from '../../components/icons.jsx'
 import { useCurrentRoom } from '../rooms/useCurrentRoom.js';
 import JoinGameModal from './JoinGameModal.jsx';
 import CreateGameModal from './CreateGameModal.jsx';
+import '../../components/Button.css';
 import './LobbyPage.css';
+
+const DISCORD_INVITE_URL = 'https://discord.gg/QUdVmBP6d';
 
 export default function LobbyPage() {
   const { user } = useAuth();
@@ -61,6 +64,15 @@ export default function LobbyPage() {
           <span className="lobby-action__text">Learn how to play</span>
         </Link>
       </nav>
+
+      <a
+        className="btn btn--secondary lobby__discord"
+        href={DISCORD_INVITE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Join Discord<span className="sr-only"> (opens in a new tab)</span>
+      </a>
 
       <CreateGameModal open={dialog === 'create'} onClose={() => setDialog(null)} />
       <JoinGameModal open={dialog === 'join'} onClose={() => setDialog(null)} />

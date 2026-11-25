@@ -113,6 +113,13 @@
 
 .lobby__resume { margin: 0 0 var(--space-4); }
 
+.lobby__discord {
+  display: flex;
+  width: fit-content;
+  margin: var(--space-4) auto 0;
+  text-decoration: none;
+}
+
 /* ---- phones and short screens: a smaller hero, so the main menu is on the first screen ---- */
 @media (max-width: 640px), (max-height: 500px) {
   .lobby__hero { padding: var(--space-3) 0 var(--space-4); }
