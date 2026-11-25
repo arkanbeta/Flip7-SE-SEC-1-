@@ -1,0 +1,126 @@
+/* Design tokens. Every colour, size, radius, shadow and timing in the app comes from
+   here, so the whole look can be changed in one file.
+
+   Art direction (redesign): a warm, slightly vintage card table. Textured cream paper for
+   cards and surfaces, a deep teal felt board fading up into muted sage, earthy tan / ochre /
+   terracotta accents and charcoal ink. No neon, no flat white, no black backgrounds. */
+:root {
+  /* ---- Raw palette ---- */
+  --teal-900: #1C4644;
+  --teal-800: #235B57;
+  --teal-700: #2A716B;
+  --teal-600: #347F77;
+  --teal-500: #4A938A;
+  --teal-300: #93C1B6;
+  --sage-600: #6F8467;
+  --sage-500: #8A9B7A;
+  --sage-300: #BAC4A3;
+  --cream-50: #FBF7EC;
+  --cream-100: #F6EFDD;
+  --cream-200: #EEE3C8;
+  --cream-300: #E3D4B0;
+  --tan-500: #A07E57;
+  --tan-700: #6F5539;
+  --ochre-500: #C4933F;
+  --terracotta-500: #B65A45;
+  --ice-500: #6FA3AE;
+  --ink-900: #2A2925;
+  --ink-600: #5F574A;
+
+  /* ---- Semantic palette (names kept from the original system) ---- */
+  --color-bg: #E7DCC0;
+  --color-surface: var(--cream-100);
+  --color-primary: var(--teal-700);    /* cream text on it: 5.6:1; it on cream: 5.0:1 */
+  --color-secondary: var(--sage-500);
+  --color-text: var(--ink-900);
+  --color-text-secondary: var(--ink-600); /* 5.6:1 on cream, 5.0:1 on the page */
+  --color-border: #DACBA8;
+  --color-success: #4F8A5B;
+  --color-warning: var(--ochre-500);
+  --color-error: var(--terracotta-500);
+  --color-on-primary: var(--cream-50);
+
+  /* ---- Derived tints (mixed into the cream surface, so they stay warm) ---- */
+  --color-primary-hover: color-mix(in srgb, var(--color-primary) 84%, black);
+  --color-primary-soft: color-mix(in srgb, var(--color-primary) 12%, var(--cream-100));
+  --color-secondary-soft: color-mix(in srgb, var(--color-secondary) 18%, var(--cream-100));
+  --color-error-soft: color-mix(in srgb, var(--color-error) 12%, var(--cream-100));
+  --color-success-soft: color-mix(in srgb, var(--color-success) 14%, var(--cream-100));
+  --color-warning-soft: color-mix(in srgb, var(--color-warning) 16%, var(--cream-100));
+
+  /* ---- Text-safe versions of the status colours (4.5:1 on cream and on the tints) ---- */
+  --color-success-text: color-mix(in srgb, var(--color-success) 72%, black);
+  --color-secondary-text: color-mix(in srgb, var(--color-secondary) 62%, black);
+  --color-error-text: color-mix(in srgb, var(--color-error) 78%, black);
+  --color-warning-text: color-mix(in srgb, var(--color-warning) 62%, black);
+  /* Form-field outlines must be at least 3:1 against the surface to be seen. */
+  --color-field-border: color-mix(in srgb, var(--color-text-secondary) 78%, var(--cream-100));
+
+  /* ---- On the board (light ink on teal felt) ---- */
+  --board-ink: var(--cream-50);
+  --board-ink-soft: color-mix(in srgb, var(--cream-50) 80%, var(--teal-700));
+  --board-line: rgb(251 247 236 / 0.16);
+  --board-well: rgb(20 52 50 / 0.24);
+  --board-highlight: #E2B25E;
+
+  /* ---- Textures (inline SVG noise: no image requests) ---- */
+  --texture-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.29 0 0 0 0 0.19 0 0 0 0.55 -0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --texture-felt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 0.97 0 0 0 0 0.9 0 0 0 0.45 -0.18'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  --board-bg:
+    radial-gradient(120% 70% at 50% 0%, rgb(255 248 228 / 0.16), transparent 60%),
+    var(--texture-felt),
+    linear-gradient(172deg, #7F9A7E 0%, #5E8E80 38%, var(--teal-600) 70%, var(--teal-800) 100%);
+  --page-bg:
+    var(--texture-paper),
+    linear-gradient(180deg, #E9DDBF 0%, #E2D8B8 55%, #CFD0AE 100%);
+
+  /* ---- Typography ---- */
+  /* Fraunces: a soft old-style serif with optical sizes, for headings, scores and the card
+     numbers. Nunito: warm, very readable body text. Fredoka stays for compact UI numerals.
+     All bundled with the app (no request to Google Fonts). */
+  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --font-body: 'Nunito Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-rounded: 'Fredoka Variable', 'Nunito Variable', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: clamp(2rem, 5vw, 2.9rem);
+  --tracking-caps: 0.12em;
+
+  /* ---- Spacing scale ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2.5rem;
+  --space-7: 4rem;
+
+  /* ---- Shape ---- */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius-pill: 999px;
+
+  /* ---- Elevation: warm, soft, layered (like paper on a table) ---- */
+  --shadow-sm: 0 1px 2px rgb(70 50 25 / 0.10), 0 1px 1px rgb(70 50 25 / 0.06);
+  --shadow-md: 0 2px 4px rgb(70 50 25 / 0.08), 0 10px 24px -6px rgb(70 50 25 / 0.22);
+  --shadow-lg: 0 4px 8px rgb(30 45 40 / 0.12), 0 22px 44px -12px rgb(30 45 40 / 0.38);
+  --shadow-card: 0 1px 1px rgb(40 35 20 / 0.18), 0 4px 10px -2px rgb(25 45 40 / 0.35);
+  --shadow-inset: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 -1px 0 rgb(110 85 50 / 0.12);
+
+  /* ---- Motion (CSS transitions; Motion for React uses the same numbers in JS) ---- */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-flip: 600ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* ---- Layers and layout ---- */
+  --z-modal: 1000;
+  --page-max: 66rem;
+}
