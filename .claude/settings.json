@@ -1,4 +1,16 @@
 {
+  "permissions": {
+    "allow": [
+      "PowerShell(Start-Process 'http://localhost:5173')",
+      "PowerShell(Get-NetTCPConnection -State Listen -LocalPort 4000,5173 -ErrorAction SilentlyContinue | ForEach-Object { $p = Get-CimInstance Win32_Process -Filter \"ProcessId=$\\($_.OwningProcess\\)\"; \"{0} pid={1} {2}\" -f $_.LocalPort, $_.OwningProcess, $p.CommandLine }; Get-Content 'C:\\\\Users\\\\RAMCOM~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\42f99661776fb880\\\\437f5820-345d-4da0-8c5a-eb5598e2793f\\\\tasks\\\\bqr1x7hbs.output' -Tail 15)",
+      "PowerShell(Get-ExecutionPolicy -List)",
+      "PowerShell(foreach \\($port in 4000,5173\\) { Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue | ForEach-Object { $proc = Get-CimInstance Win32_Process -Filter \"ProcessId=$\\($_.OwningProcess\\)\"; Stop-Process -Id $proc.ParentProcessId -Force -Confirm:$false -ErrorAction SilentlyContinue; Stop-Process -Id $_.OwningProcess -Force -Confirm:$false -ErrorAction SilentlyContinue } }; Start-Sleep -Seconds 2; $left = Get-NetTCPConnection -State Listen -LocalPort 4000,5173 -ErrorAction SilentlyContinue; if \\($left\\) { $left | Select-Object LocalPort,OwningProcess } else { 'ports 4000 and 5173 are free' })",
+      "PowerShell(npm run dev)",
+      "PowerShell(Start-Process 'http://localhost:5173/api/auth/dev?player=1')",
+      "PowerShell(try { \\(Invoke-WebRequest -UseBasicParsing http://localhost:4000/api/health\\).Content } catch { \"backend: \" + $_.Exception.Message })",
+      "Bash(node scripts/bots.js P3ZX4M 2)"
+    ]
+  },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true
   }
