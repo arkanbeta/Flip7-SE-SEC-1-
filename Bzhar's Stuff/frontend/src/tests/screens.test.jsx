@@ -69,6 +69,13 @@ describe('lobby', () => {
     expect(router.state.location.pathname).toBe('/rules');
   });
 
+  it('links to the Discord server invite in a new tab', async () => {
+    renderAt('/lobby');
+    const link = await screen.findByRole('link', { name: /join discord/i });
+    expect(link.getAttribute('href')).toBe('https://discord.gg/QUdVmBP6d');
+    expect(link.getAttribute('target')).toBe('_blank');
+  });
+
   it('Create Game opens a dialog, and Escape closes it', async () => {
     api.getRoomModes.mockResolvedValue({ modes: [{ id: 1, name: 'Normal' }] });
     renderAt('/lobby');
